@@ -1,0 +1,35 @@
+{
+	"compilerOptions": {
+		"declarationDir": "Types",
+		"declaration": true,
+		"noEmit": false,
+		"emitDeclarationOnly": true,
+		"esModuleInterop": true,
+		"moduleResolution": "node",
+		// allows type-checking for JSON filex
+		"resolveJsonModule": true,
+		// type checking properties
+		"allowJs": true,
+		"checkJs": true,
+		"allowUnreachableCode": false,
+		"alwaysStrict": true,
+		"noFallthroughCasesInSwitch": true,
+		"noImplicitAny": true,
+		"noImplicitReturns": true,
+		"noImplicitThis": true,
+		"noImplicitOverride": true,
+		"noUnusedLocals": true,
+		"noUnusedParameters": true,
+		"strictFunctionTypes": true,
+		// compile options
+		"lib": [
+			"ES2022"
+		],
+		"target": "ES2022", 
+		"baseUrl": ".",
+		// import spark ar types
+		"paths": {
+			"*": ["../spark-ar-types/Types/*"],
+		}
+	}
+}
