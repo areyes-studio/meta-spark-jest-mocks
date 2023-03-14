@@ -3,7 +3,7 @@ import TextureBaseMock from "./TextureBase.mock";
 /** @type {TextureBaseMock[]} */
 let TextureStructure = [];
 
-export default class TextureMock {
+export class TexturesMock {
     /**
      * @param {string} textureName 
      */
@@ -36,3 +36,5 @@ export default class TextureMock {
         TextureStructure = structure.map(s => new TextureBaseMock(s)) ?? [];
     }
 }
+
+export default TexturesMock 

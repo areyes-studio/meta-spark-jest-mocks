@@ -1,9 +1,9 @@
 import SignalMock from './Signal.mock';
 import ScalarSignalMock from './ScalarSignal.mock';
-import StringSignalMock from './StringSignalMock';
+import StringSignalMock from './StringSignal.mock';
 import EventSourceMock from './EventSource.mock';
 
-export default class BoolSignalMock extends SignalMock {
+export class BoolSignalMock extends SignalMock {
     /**
      * @param {boolean} value
      * @memberof ScalarSignalMock
@@ -242,3 +242,5 @@ function monitor(outputSignal, inputFirstSignal, inputSecondSignal, newOwnsignal
         })
     }
 }
+
+export default BoolSignalMock 

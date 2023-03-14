@@ -29,7 +29,10 @@
 		"baseUrl": ".",
 		// import spark ar types
 		"paths": {
-			"*": ["../spark-ar-types/Types/*"],
+			"*": [
+				"./node_modules/@areyes-studio/meta-spark-types/Types/*"
+			]
 		}
-	}
+	},
+	"include": ["src/**/*"]
 }

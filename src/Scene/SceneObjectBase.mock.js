@@ -32,7 +32,7 @@ import { Vector3 } from '@areyes-studio/math-module';
  * @property {number} [scaleZ=1]
  */
 
-export default class SceneObjectBaseMock {
+export class SceneObjectBaseMock {
     /**
      * @param {SceneObjectBaseMockParams} params
      * @param {SceneObjectBaseMock} parent
@@ -347,3 +347,5 @@ export default class SceneObjectBaseMock {
         await remove();
     }
 }
+
+export default SceneObjectBaseMock

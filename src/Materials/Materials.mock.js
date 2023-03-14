@@ -3,7 +3,7 @@ import MaterialBaseMock from "./MaterialBase.mock";
 /** @type {MaterialBaseMock[]} */
 let MaterialStructure = [];
 
-export default class MaterialMock {
+export class MaterialsMock {
     /**
      * @param {string} materialName 
      */
@@ -37,3 +37,5 @@ export default class MaterialMock {
     }
 
 }
+
+export default MaterialsMock

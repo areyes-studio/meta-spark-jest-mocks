@@ -2,7 +2,7 @@
 import PatchesInputsMock from "./PatchesInputs.mock";
 import PatchesOuputsMock from "./PatchesOutputs.mock";
 
-export default class PatchesMock {
+export class PatchesMock {
     static get inputs() {
         return PatchesInputsMock
     }
@@ -11,3 +11,5 @@ export default class PatchesMock {
         return PatchesOuputsMock
     }
 }
+
+export default PatchesMock

@@ -2,7 +2,7 @@ import ScalarSignalMock from "../Reactive/ScalarSignal.mock";
 import TimeDriver from "./TimeDriver.mock";
 import { AMath } from '@areyes-studio/math-module';
 
-export default class AnimationMock {
+export class AnimationMock {
     /**
      * @static
      * @param {{durationMilliseconds?: number, loopCount?: number, mirror?: false | true}} params
@@ -791,3 +791,5 @@ class SamplerFactory {
 
     }
 }
+
+export default AnimationMock;

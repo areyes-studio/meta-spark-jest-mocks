@@ -1,6 +1,6 @@
 let print = true;
 
-export default class DiagnosticsMock {
+export class DiagnosticsMock {
     /**
      * @static
      * @param {string} text
@@ -32,3 +32,5 @@ export default class DiagnosticsMock {
         print = true;
     }
 }
+
+export default DiagnosticsMock

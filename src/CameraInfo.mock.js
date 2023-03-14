@@ -1,4 +1,4 @@
-import StringSignalMock from "./Reactive/StringSignalMock"
+import StringSignalMock from "./Reactive/StringSignal.mock"
 import BoolSignalMock from "./Reactive/BoolSignal.mock"
 import ScalarSignalMock from "./Reactive/ScalarSignal.mock"
 import Vec2SignalMock from "./Reactive/Vec2Signal.mock"
@@ -20,7 +20,7 @@ let cameraInfoModuleStructure = {
     })
 }
 
-export default class CameraInfoModuleMock {
+export class CameraInfoModuleMock {
 
     static get captureDevicePosition() {
         return cameraInfoModuleStructure['captureDevicePosition']
@@ -82,3 +82,5 @@ export default class CameraInfoModuleMock {
         })
     }
 }
+
+export default CameraInfoModuleMock

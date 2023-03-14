@@ -3,7 +3,7 @@ import EventSourceMock from "../Reactive/EventSource.mock";
 import ScalarSignalMock from "../Reactive/ScalarSignal.mock";
 import TimeMock from "../Time.mock";
 
-export default class TimeDriverMock {
+export class TimeDriverMock {
     /**
      * @param {number} durationMilliseconds
      * @param {number} loopCount
@@ -107,3 +107,5 @@ export default class TimeDriverMock {
         await this.progress.mockUpdate(progress);
     }
 }
+
+export default TimeDriverMock;

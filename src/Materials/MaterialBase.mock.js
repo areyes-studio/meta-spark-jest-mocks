@@ -16,7 +16,7 @@ import TextureBase from "../Textures/TextureBase.mock";
  * @property {string} [type]
  */
 
-export default class MaterialBaseMock {
+export class MaterialBaseMock {
     /**
      * @param {MaterialBaseMockParams} params 
      * @memberof SceneObjectBaseMock 
@@ -97,3 +97,5 @@ export default class MaterialBaseMock {
         return this._diffuse;
     }
 }
+
+export default MaterialBaseMock;

@@ -6,7 +6,7 @@ import SubscriptionMock from './Subscription.mock';
 
 import { Vector3, Vector2 } from '@areyes-studio/math-module';
 
-export default class VectorSignalMock extends SignalMock {
+export class VectorSignalMock extends SignalMock {
     /**
      * @param {Vector3} value
      * @memberof VectorSignalMock
@@ -1314,3 +1314,5 @@ function monitorForTwoArg(firstSignal, secondSignal, thirdSignal, signal, callba
         })
     }
 }
+
+export default VectorSignalMock

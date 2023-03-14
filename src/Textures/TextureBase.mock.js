@@ -10,7 +10,7 @@ import ScalarSignalMock from "../Reactive/ScalarSignal.mock";
  * @property {string} [type]
  */
 
-export default class TextureBaseMock {
+export class TextureBaseMock {
     /**
      * @param {TextureBaseMockParams} params 
      * @memberof SceneObjectBaseMock 
@@ -43,3 +43,5 @@ export default class TextureBaseMock {
         return this._width;
     }
 }
+
+export default TextureBaseMock

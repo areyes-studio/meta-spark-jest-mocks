@@ -5,6 +5,9 @@
 	"author": {
 		"name": "AREYES.STUDIO"
 	},
+	"main": "./build/main.js",
+	"types": "./types/main.d.ts",
+	"type": "module",
 	"license": "MIT",
 	"devDependencies": {
 		"@babel/plugin-transform-modules-commonjs": "^7.20.11",
@@ -16,11 +19,14 @@
 		"jest-extended": "^3.2.1"
 	},
 	"scripts": {
-		"test": "jest"
+		"test": "jest",
+		"build": "rollup --config && npx -p typescript tsc --declaration --allowJs --emitDeclarationOnly --outDir types"
 	},
 	"dependencies": {
 		"@areyes-studio/math-module": "^1.0.0",
-		"quaternion": "^1.4.0"
+		"@areyes-studio/meta-spark-types": "^158.0.0",
+		"quaternion": "^1.4.0",
+		"rollup": "^3.19.1"
 	},
 	"jest": {
 		"testEnvironment": "jest-environment-node",

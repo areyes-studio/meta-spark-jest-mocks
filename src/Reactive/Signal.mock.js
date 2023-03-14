@@ -1,7 +1,7 @@
 import EventSourceMock from './EventSource.mock.js';
 import SubscriptionMock from './Subscription.mock.js';
 
-export default class SignalMock {
+export class SignalMock {
     /**
      * @param {any} value
      * @memberof SignalMock
@@ -70,3 +70,5 @@ export default class SignalMock {
         await update();
     }
 }
+
+export default SignalMock

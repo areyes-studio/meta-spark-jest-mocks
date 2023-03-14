@@ -3,7 +3,7 @@ import ScalarSignalMock from './ScalarSignal.mock';
 import Quaternion from 'quaternion';
 import SubscriptionMock from './Subscription.mock';
 
-export default class QuaternionSignalMock extends SignalMock {
+export class QuaternionSignalMock extends SignalMock {
     /**
      * @param {Quaternion} value
      * @memberof ScalarSignalMock
@@ -309,6 +309,7 @@ export default class QuaternionSignalMock extends SignalMock {
     //     return newSignal;
     // }
 }
+
 /**
  * @param {SignalMock} outputSignal
  * @param {SignalMock | boolean | string | number | null} inputFirstSignal
@@ -333,3 +334,5 @@ function monitor(outputSignal, inputFirstSignal, inputSecondSignal, newOwnsignal
         })
     }
 }
+
+export default QuaternionSignalMock

@@ -8,7 +8,7 @@ let sceneStructure = [];
 
 let possibleDynamicSceneObjects = ['Block', 'Plane', 'Canvas', 'PlanarImage', 'AmbientLightSource', 'DirectionalLightSource', 'PointLightSource', 'SpotLightSource', 'ParticleSystem', 'SceneObject']
 
-export default class SceneMock {
+export class SceneMock {
     static get root() {
         if (!root) {
             root = new SceneObjectBaseMock({name: 'root', children: sceneStructure});
@@ -126,3 +126,5 @@ export default class SceneMock {
         await destroy();
     }
 }
+
+export default SceneMock

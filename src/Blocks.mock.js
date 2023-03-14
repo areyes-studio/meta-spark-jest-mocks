@@ -9,7 +9,7 @@ import StorageLocation from "./Persistence/StorageLocation.mock";
  * @property {StorageLocation} storage
  */
 
-export default class BlocksMock {
+export class BlocksMock {
     /**
      * @param {string} blockName 
      * @param {import("./Scene/SceneObjectBase.mock").SceneObjectBaseMockParams} initialState
@@ -19,3 +19,5 @@ export default class BlocksMock {
         return Scene.create('Block', initialState)
     }
 }
+
+export default BlocksMock

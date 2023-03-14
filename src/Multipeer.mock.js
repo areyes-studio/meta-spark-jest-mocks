@@ -27,7 +27,7 @@ export class EchoMessageChannelMock {
     }
 }
 
-export default class MultipeerMock {
+export class MultipeerMock {
     constructor() {
         /**@type {{[key: string]: any}} */
         this._channels = {};
@@ -51,3 +51,5 @@ export default class MultipeerMock {
         return this._channels[topic];
     }
 }
+
+export default MultipeerMock

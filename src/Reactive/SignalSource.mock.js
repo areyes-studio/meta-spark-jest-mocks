@@ -1,5 +1,5 @@
 import ScalarSignalMock from './ScalarSignal.mock';
-import StringSignalMock from './StringSignalMock';
+import StringSignalMock from './StringSignal.mock';
 import BoolSignalMock from './BoolSignal.mock';
 
 export class ScalarSignalSourceMock {

@@ -11,7 +11,7 @@ ms.monitor().subscribe(async (/** @type {{ newValue: number; oldValue: number; }
 /** @type {SubscriptionMock[]} */
 let subscriptions = [];
 
-export default class TimeMock {
+export class TimeMock {
     static get deltaTimeMS() {
         return deltaTimeMS;
     }
@@ -128,3 +128,5 @@ export default class TimeMock {
         subscriptions = [];
     }
 }
+
+export default TimeMock

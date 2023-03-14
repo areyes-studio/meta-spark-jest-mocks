@@ -4,7 +4,7 @@ import SignalMock from "./Signal.mock";
 
 import { Vector3, Matrix } from '@areyes-studio/math-module';
 
-export default class Mat4Mock extends SignalMock {
+export class Mat4Mock extends SignalMock {
     /**
      * @param {Matrix} value
      * @memberof Mat4
@@ -146,3 +146,5 @@ export default class Mat4Mock extends SignalMock {
         return mat4;
     }
 }
+
+export default Mat4Mock

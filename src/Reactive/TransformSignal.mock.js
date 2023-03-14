@@ -8,7 +8,7 @@ import SignalMock from "./Signal.mock";
 
 import { Vector3 } from '@areyes-studio/math-module';
 
-export default class TransformSignalMock extends SignalMock {
+export class TransformSignalMock extends SignalMock {
     /**
      * @param {{ position: Vector3, rotation: Quaternion, scale: Vector3 }} value
      * @memberof TransformSignalMock
@@ -232,3 +232,5 @@ function rotateVector(vector, rotation) {
     let point_q = Reactive.quaternion(0, vector.x, vector.y, vector.z);
     return rotation.mul(point_q).mul(rotation.conjugate());
 }
+
+export default TransformSignalMock

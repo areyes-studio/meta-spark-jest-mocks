@@ -1,4 +1,4 @@
-export default class StorageLocationMock {
+export class StorageLocationMock {
     
     /**
      * @param {Object<string,Object>} storageLocationData 
@@ -32,3 +32,5 @@ export default class StorageLocationMock {
         this._storageLocationData[key] = value
     }
 }
+
+export default StorageLocationMock

@@ -3,7 +3,7 @@ import StorageLocationMock from "./StorageLocation.mock"
 let block = new StorageLocationMock()
 let local = new StorageLocationMock()
 
-export default class PersistenceMock {
+export class PersistenceMock {
     
     static get block() {
         return block
@@ -23,3 +23,5 @@ export default class PersistenceMock {
         local = new StorageLocationMock(localParam)
     }
 }
+
+export default PersistenceMock

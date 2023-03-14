@@ -6,7 +6,7 @@ import VectorSignalMock from './VectorSignal.mock';
 
 import { Vector3, Vector2 } from '@areyes-studio/math-module';
 
-export default class ScalarSignalMock extends SignalMock {
+export class ScalarSignalMock extends SignalMock {
     /**
      * @param {number} value
      * @memberof ScalarSignalMock
@@ -1149,3 +1149,5 @@ function monitorForTwoArg(firstSignal, secondSignal, thirdSignal, signal, callba
         })
     }
 }
+
+export default ScalarSignalMock

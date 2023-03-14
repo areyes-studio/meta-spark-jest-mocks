@@ -106,3 +106,43 @@ jest.mock(
 	},
 	{ virtual: true },
 );
+
+export { AnimationMock } from "./Animation/Animation.mock";
+export { TimeDriverMock } from "./Animation/TimeDriver.mock";
+
+export { MaterialBaseMock } from "./Materials/MaterialBase.mock";
+export { MaterialsMock } from "./Materials/Materials.mock";
+
+export { PatchesMock } from "./Patches/Patches.mock";
+export { PatchesInputsMock } from "./Patches/PatchesInputs.mock";
+export { PatchesOuputsMock } from "./Patches/PatchesOutputs.mock";
+
+export { PersistenceMock } from "./Persistence/Persistence.mock";
+export { StorageLocationMock } from "./Persistence/StorageLocation.mock";
+
+export { BoolSignalMock } from "./Reactive/BoolSignal.mock";
+export { EventSourceMock } from "./Reactive/EventSource.mock";
+export { Mat4Mock } from "./Reactive/Mat4.mock";
+export { QuaternionSignalMock } from "./Reactive/QuaternionSignal.mock";
+export { ReactiveMock } from "./Reactive/Reactive.mock";
+export { ScalarSignalMock } from "./Reactive/ScalarSignal.mock";
+export { SignalMock } from "./Reactive/Signal.mock";
+export { ScalarSignalSourceMock, StringSignalSourceMock, BoolSignalSourceMock } from "./Reactive/SignalSource.mock";
+export { StringSignalMock } from "./Reactive/StringSignal.mock";
+export { SubscriptionMock } from "./Reactive/Subscription.mock";
+export { TransformSignalMock } from "./Reactive/TransformSignal.mock";
+export { Vec2SignalMock } from "./Reactive/Vec2Signal.mock";
+export { VectorSignalMock } from "./Reactive/VectorSignal.mock";
+
+export { SceneMock } from "./Scene/SceneModule.mock";
+export { SceneObjectBaseMock } from "./Scene/SceneObjectBase.mock";
+
+export { TextureBaseMock } from "./Textures/TextureBase.mock";
+export { TexturesMock } from "./Textures/Textures.mock";
+
+export { BlocksMock } from "./Blocks.mock";
+export { CameraInfoModuleMock } from "./CameraInfo.mock";
+export { DiagnosticsMock } from "./Diagnostics.mock";
+export { MultipeerMock } from "./Multipeer.mock";
+export { ParticipantsMock } from "./Participants.mock";
+export { TimeMock } from "./Time.mock";

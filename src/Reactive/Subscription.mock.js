@@ -1,4 +1,4 @@
-export default class SubscriptionMock {
+export class SubscriptionMock {
     /**
      * @param {Set<any>} subcriptions
      * @param {Object} subcriptionData
@@ -13,3 +13,5 @@ export default class SubscriptionMock {
         this._subcriptions.delete(this._subcriptionsData);
     }
 }
+
+export default SubscriptionMock

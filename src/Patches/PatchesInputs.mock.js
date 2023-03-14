@@ -1,5 +1,5 @@
 import SignalMock from "../Reactive/Signal.mock";
-import StringSignalMock from "../Reactive/StringSignalMock";
+import StringSignalMock from "../Reactive/StringSignal.mock";
 import BoolSignalMock from "../Reactive/BoolSignal.mock";
 import ScalarSignalMock from "../Reactive/ScalarSignal.mock";
 import Vec2SignalMock from "../Reactive/Vec2Signal.mock";
@@ -9,7 +9,7 @@ import VectorSignalMock from "../Reactive/VectorSignal.mock";
 /** @type {Object<string, SignalMock|EventSourceMock>} */
 let  PatchesStructureInputs = {}
 
-export default class PatchesInputsMock {
+export class PatchesInputsMock {
     /**
      * @param {string} name 
      * @param {SignalMock | boolean | number | string} signal 
@@ -133,3 +133,5 @@ export default class PatchesInputsMock {
         return PatchesStructureInputs
     }
 }
+
+export default PatchesInputsMock

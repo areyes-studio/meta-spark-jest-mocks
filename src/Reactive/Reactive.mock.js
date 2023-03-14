@@ -4,14 +4,14 @@ import ScalarSignalMock from './ScalarSignal.mock';
 import { ScalarSignalSourceMock, StringSignalSourceMock, BoolSignalSourceMock } from './SignalSource.mock';
 import VectorSignalMock from './VectorSignal.mock';
 import Vec2SignalMock from './Vec2Signal.mock';
-import StringSignalMock from './StringSignalMock';
+import StringSignalMock from './StringSignal.mock';
 import BoolSignalMock from './BoolSignal.mock';
 import EventSourceMock from './EventSource.mock';
 import TransformSignalMock from './TransformSignal.mock';
 
 import { Vector3, Vector2 } from '@areyes-studio/math-module';
 
-export default class ReactiveMock {
+export class ReactiveMock {
     /**
      * @param {string} name
      * @return {ScalarSignalSourceMock} 
@@ -1510,3 +1510,5 @@ function monitorForThreeArg(firstSignal, secondSignal, thirdSignal, signal, call
         })
     }
 }
+
+export default ReactiveMock

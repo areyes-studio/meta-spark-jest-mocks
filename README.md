@@ -9,13 +9,19 @@ You can install this package using npm:
 ## Usage
 Import the mocks into your test files and use them to mock the Meta Spark Studio modules:
 
-    import { mockModuleA, mockModuleB } from '@areyes.studio/meta-spark-jest-mocks';
+    import { ReactiveMock, ScalarSignalMock } from "@areyes-studio/meta-spark-jest-mocks";
 
-    jest.mock('module-a', () => mockModuleA);
-    jest.mock('module-b', () => mockModuleB);
+    test('Check vector method', async () => {
+        let x = new ScalarSignalMock(0);
+        let vector = ReactiveMock.vector(x, 0, 0);
 
-    describe('My test suite', () => {
-    // Tests using the mocked modules
+        expect(vector.x.pinLastValue()).toBe(0);
+        expect(vector.y.pinLastValue()).toBe(0);
+        
+        await x.mockUpdate(1);
+
+        expect(vector.x.pinLastValue()).toBe(1);
+        expect(vector.y.pinLastValue()).toBe(0);
     });
 
 You can modify these mocks as needed to fit your specific testing requirements.

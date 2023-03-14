@@ -1,6 +1,6 @@
 import SubscriptionMock from "./Subscription.mock";
 
-export default class EventSourceMock {
+export class EventSourceMock {
     constructor(config, source) {
         this._subcriptions = new Set();
         this._config = config;
@@ -44,3 +44,5 @@ export default class EventSourceMock {
         }
     }
 }
+
+export default EventSourceMock

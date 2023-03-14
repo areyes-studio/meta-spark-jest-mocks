@@ -1,5 +1,5 @@
 import SignalMock from "../Reactive/Signal.mock";
-import StringSignalMock from "../Reactive/StringSignalMock";
+import StringSignalMock from "../Reactive/StringSignal.mock";
 import BoolSignalMock from "../Reactive/BoolSignal.mock";
 import ScalarSignalMock from "../Reactive/ScalarSignal.mock";
 import Vec2SignalMock from "../Reactive/Vec2Signal.mock";
@@ -10,7 +10,7 @@ import VectorSignalMock from "../Reactive/VectorSignal.mock";
 let PatchesStructureOutputs = {};
 
 //Skipped getColor, getColorOrFallback methods
-export default class PatchesOuputsMock {
+export class PatchesOuputsMock {
     /**
      * @param {string} name 
      */
@@ -221,3 +221,5 @@ export default class PatchesOuputsMock {
         PatchesStructureOutputs = value
     }
 }
+
+export default PatchesOuputsMock
