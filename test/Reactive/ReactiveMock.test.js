@@ -1,6 +1,6 @@
 import Reactive from "../../src/Reactive/Reactive.mock";
 import ScalarSignalMock from "../../src/Reactive/ScalarSignal.mock";
-import StringSignalMock from "../../src/Reactive/StringSignalMock";
+import StringSignalMock from "../../src/Reactive/StringSignal.mock";
 import BoolSignalMock from "../../src/Reactive/BoolSignal.mock";
 import Vec2SignalMock from "../../src/Reactive/Vec2Signal.mock";
 import VectorSignalMock from "../../src/Reactive/VectorSignal.mock";

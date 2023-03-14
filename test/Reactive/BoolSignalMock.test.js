@@ -1,6 +1,6 @@
 import BoolSignalMock from "../../src/Reactive/BoolSignal.mock";
 import ScalarSignalMock from "../../src/Reactive/ScalarSignal.mock";
-import StringSignalMock from "../../src/Reactive/StringSignalMock";
+import StringSignalMock from "../../src/Reactive/StringSignal.mock";
 import SubscriptionMock from "../../src/Reactive/Subscription.mock";
 
 test('test onOn function', async () => {

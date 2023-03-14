@@ -1,4 +1,4 @@
-import StringSignalMock from "../../src/Reactive/StringSignalMock";
+import StringSignalMock from "../../src/Reactive/StringSignal.mock";
 import BoolSignalMock from "../../src/Reactive/BoolSignal.mock";
 
 test('check concat function', async () => {

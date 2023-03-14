@@ -1,6 +1,6 @@
 
 import PatchesOuputsMock from "../../src/Patches/PatchesOutputs.mock";
-import StringSignalMock from "../../src/Reactive/StringSignalMock";
+import StringSignalMock from "../../src/Reactive/StringSignal.mock";
 import BoolSignalMock from "../../src/Reactive/BoolSignal.mock";
 import ScalarSignalMock from "../../src/Reactive/ScalarSignal.mock";
 import Vec2SignalMock from "../../src/Reactive/Vec2Signal.mock";
