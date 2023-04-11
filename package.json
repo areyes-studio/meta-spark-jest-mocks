@@ -1,7 +1,7 @@
 {
 	"name": "@areyes-studio/meta-spark-jest-mocks",
 	"description": "Jest mocks for Meta Spark Studio modules",
-	"version": "1.1.0",
+	"version": "1.2.0",
 	"author": {
 		"name": "AREYES.STUDIO"
 	},
