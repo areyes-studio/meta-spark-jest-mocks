@@ -4,7 +4,7 @@ This package provides Jest mocks for the modules used in Meta Spark Studio.
 ## Installation
 You can install this package using npm:
 
-    npm install @areyes.studio/meta-spark-jest-mocks --save-dev
+    npm install @areyes-studio/meta-spark-jest-mocks --save-dev
 
 ## Usage
 Import the mocks into your test files and use them to mock the Meta Spark Studio modules:
