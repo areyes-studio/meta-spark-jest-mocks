@@ -1,6 +1,6 @@
 {
 	"compilerOptions": {
-		"declarationDir": "Types",
+		"declarationDir": "types",
 		"declaration": true,
 		"noEmit": false,
 		"emitDeclarationOnly": true,

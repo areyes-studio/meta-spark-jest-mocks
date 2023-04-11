@@ -3,6 +3,41 @@
 var Quaternion = require('quaternion');
 var mathModule = require('@areyes-studio/math-module');
 
+let print = true;
+
+class DiagnosticsMock {
+    /**
+     * @static
+     * @param {string} text
+     * @memberof DiagnosticsMock
+     */
+    static error(text) { if (print) console.log(text); }
+
+    /**
+     * @static
+     * @param {string} text
+     * @memberof DiagnosticsMock
+     */
+    static log(text) { if (print) console.log(text); }
+
+    /**
+     * @static
+     * @param {string} text
+     * @memberof DiagnosticsMock
+     */
+    static warn(text) { if (print) console.log(text); }
+
+    static watch() { }
+
+    static mockLogDisable() {
+        print = false;
+    }
+
+    static mockLogEnable() {
+        print = true;
+    }
+}
+
 class SubscriptionMock {
     /**
      * @param {Set<any>} subcriptions
@@ -134,359 +169,6 @@ class SignalMock {
     }
 }
 
-class StringSignalMock extends SignalMock {
-    /**
-     * @param {string} value
-     * @memberof ScalarSignalMock
-     */
-    constructor(value) {
-        super(value);
-    }
-
-    /**
-     * @param {string | StringSignalMock} signal 
-     * @memberof StringSignalMock
-     * @returns StringSignalMock
-     */
-    concat(signal) {
-        let callback = () => {
-            return (typeof signal === 'string') ? this.value.concat(signal) : this.value.concat(signal.value)
-        };
-        
-        let newSignal = new StringSignalMock(callback());
-
-        monitor$6(this, signal, null, newSignal, callback);
-
-        return newSignal;
-    }
-    
-    /**
-     * @param {string | StringSignalMock} signal
-     * @memberof StringSignalMock
-     * @returns BoolSignal
-     */
-    contains(signal) {
-        let callback = () => {
-            return (typeof signal === 'string') ? this.value.includes(signal) : this.value.includes(signal.value)
-        };
-        
-        let newSignal = new BoolSignalMock$1(callback());
-
-        monitor$6(this, signal, null, newSignal, callback);
-
-        return newSignal;
-    }
-
-    /**
-     * @param {string | StringSignalMock} signal
-     * @memberof StringSignalMock
-     * @returns BoolSignal
-     */
-    eq(signal) {
-        let callback = () => {
-            return (typeof signal === 'string') ? this.value == signal : this.value == signal.value 
-        };
-        
-        let newSignal = new BoolSignalMock$1(callback());
-
-        monitor$6(this, signal, null, newSignal, callback);
-
-        return newSignal;
-    }
-
-    /**
-     * @param {string | StringSignalMock} signal
-     * @memberof StringSignalMock
-     * @returns BoolSignal
-     */
-    ne(signal) {
-        let callback = () => {
-            return (typeof signal === 'string') ? this.value != signal : this.value != signal.value 
-        };
-        
-        let newSignal = new BoolSignalMock$1(callback());
-
-        monitor$6(this, signal, null, newSignal, callback);
-
-        return newSignal;
-    }
-
-    pin() {
-        return new StringSignalMock(this._value);
-    }
-
-    pinLastValue() {
-        return this._value;
-    }
-}
-
-/**
- * @param {SignalMock} outputSignal
- * @param {SignalMock | boolean | string | number | null} inputFirstSignal
- * @param {SignalMock | boolean | string | number | null} inputSecondSignal
- * @param {SignalMock} newOwnsignal
- * @param {Function} callback
- */
-function monitor$6(outputSignal, inputFirstSignal, inputSecondSignal, newOwnsignal, callback) {
-    outputSignal.monitor().subscribe(async () => {
-        await newOwnsignal.mockUpdate(callback());
-    });
-
-    if (typeof inputFirstSignal !== 'string' && typeof inputFirstSignal !== 'number' && typeof inputFirstSignal !== 'boolean' && inputFirstSignal !== null && inputFirstSignal !== undefined) {
-        inputFirstSignal.monitor().subscribe(async () => {
-            await newOwnsignal.mockUpdate(callback());
-        });
-    }
-
-    if (typeof inputSecondSignal !== 'string' && typeof inputSecondSignal !== 'number' && typeof inputSecondSignal !== 'boolean' && inputSecondSignal !== null && inputSecondSignal !== undefined) {
-        inputSecondSignal.monitor().subscribe(async () => {
-            await newOwnsignal.mockUpdate(callback());
-        });
-    }
-}
-
-class BoolSignalMock extends SignalMock {
-    /**
-     * @param {boolean} value
-     * @memberof ScalarSignalMock
-     */
-    constructor(value) {
-        super(value);
-    }
-
-    /**
-     * @param {{ fireOnInitialValue: boolean; }} [config]
-     */
-    onOn(config) {
-        let eventSource = new EventSourceMock(config, this);
-
-        this.monitor().subscribe(async () => {
-            if (this.value === true)         
-                await eventSource.mockCallback();
-        });
-
-        return eventSource;
-    }
-
-    /**
-     * @param {{ fireOnInitialValue: boolean; }} [config]
-     */
-    onOff(config) {
-        let eventSource = new EventSourceMock(config, this);
-
-        this.monitor().subscribe(async () => {
-            if (this.value === false)         
-                await eventSource.mockCallback();
-        });
-
-        return eventSource;
-    }
-
-    /** 
-     * @param {boolean | BoolSignalMock} signal 
-     * @memberof BoolSignalMock
-     * @returns BoolSignalMock
-     */
-    or(signal) {
-        let callback = () => {
-            return (typeof signal === 'boolean') ? this.value || signal : this.value || signal.value
-        };
-        
-        let newSignal = new BoolSignalMock(callback());
-
-        monitor$5(this, signal, null, newSignal, callback);
-
-        return newSignal;
-    }
-
-    /** 
-     * @param {boolean | BoolSignalMock} signal 
-     * @memberof BoolSignalMock
-     * @returns BoolSignalMock
-     */
-    and(signal) {
-        let callback = () => {
-            return (typeof signal === 'boolean') ? this.value && signal : this.value && signal.value
-        };
-        
-        let newSignal = new BoolSignalMock(callback());
-
-        monitor$5(this, signal,null, newSignal, callback);
-
-        return newSignal;
-    }
-
-    /** 
-     * @param {boolean | BoolSignalMock} signal 
-     * @memberof BoolSignalMock
-     * @returns BoolSignalMock
-     */
-    eq(signal) {
-        let callback = () => {
-            return (typeof signal === 'boolean') ? this.value == signal : this.value == signal.value
-        };
-        
-        let newSignal = new BoolSignalMock(callback());
-
-        monitor$5(this, signal, null, newSignal, callback);
-
-        return newSignal;
-    }
-
-    /** 
-     * @param {boolean | BoolSignalMock} signal 
-     * @memberof BoolSignalMock
-     * @returns BoolSignalMock
-     */
-    ne(signal) {
-        let callback = () => {
-            return (typeof signal === 'boolean') ? this.value != signal : this.value != signal.value
-        };
-        
-        let newSignal = new BoolSignalMock(callback());
-
-        monitor$5(this, signal, null, newSignal, callback);
-
-        return newSignal;
-    }
-
-    /** 
-     * @memberof BoolSignalMock
-     * @returns BoolSignalMock
-     */
-    not() {
-        let callback = () => {
-            // @ts-ignore
-            return  !this.value
-        };
-        
-        let newSignal = new BoolSignalMock(callback());
-
-        monitor$5(this, null, null, newSignal, callback);
-
-        return newSignal;
-    }
-
-    /** 
-     * @param {boolean | BoolSignalMock} signal 
-     * @memberof BoolSignalMock
-     * @returns BoolSignalMock
-     */
-    xor(signal) {
-        let callback = () => {
-            return (typeof signal === 'boolean') ? (this.value || signal) && !(this.value && signal) : (this.value || signal.value) && !(this.value && signal.value)
-        };
-        
-        let newSignal = new BoolSignalMock(callback());
-
-        monitor$5(this, signal, null, newSignal, callback);
-
-        return newSignal;
-    }
-
-    /**
-     * @param {boolean | BoolSignalMock | string | StringSignalMock | number | ScalarSignalMock} thenSignal 
-     * @param {boolean | BoolSignalMock | string | StringSignalMock | number | ScalarSignalMock} elseSignal
-     * @memberof BoolSignalMock
-     * @returns BoolSignalMock  
-     */
-    ifThenElse(thenSignal, elseSignal) {
-        /**@type {boolean | string | number}*/
-        let thenSignalValue,
-        /**@type {boolean | string | number}*/
-        elseSignalValue;
-
-        let callback = () => {
-            switch (typeof thenSignal) {
-                case 'boolean':     
-                case 'string':
-                case 'number':
-                    thenSignalValue = thenSignal;
-                    break;
-    
-                default:
-                    thenSignalValue = thenSignal.value; 
-                    break;
-    
-            }
-    
-            switch (typeof elseSignal) {
-                case 'boolean': 
-                case 'string':
-                case 'number':
-                    elseSignalValue = elseSignal;
-                    break;
-    
-                default:
-                    elseSignalValue = elseSignal.value; 
-                    break;
-            }
-            return this.value ? thenSignalValue : elseSignalValue
-        };
-
-        let newSignal;
-
-        switch (typeof callback()) {
-            case 'string':
-                newSignal = new StringSignalMock(/** @type {string} */ (callback()));
-                break;
-
-            case 'number':
-                newSignal = new ScalarSignalMock$1(/** @type {number} */ (callback()));
-                break;
-            
-            case 'boolean':
-                newSignal = new BoolSignalMock(/** @type {boolean} */ (callback()));
-                break;
-        }
-
-        monitor$5(this, thenSignal, elseSignal, newSignal, callback);
-
-        return newSignal;
-    }
-
-    /**
-     * @returns BoolSignalMock
-     */
-    pin() {
-        return new BoolSignalMock(this._value);
-    }
-
-    /**
-     * @returns boolean
-     */
-    pinLastValue() {
-        return this._value;
-    }
-}
-
-/**
- * @param {SignalMock} outputSignal
- * @param {SignalMock | boolean | string | number | null} inputFirstSignal
- * @param {SignalMock | boolean | string | number | null} inputSecondSignal
- * @param {SignalMock} newOwnsignal
- * @param {Function} callback
- */
-function monitor$5(outputSignal, inputFirstSignal, inputSecondSignal, newOwnsignal, callback) {
-    outputSignal.monitor().subscribe(async () => {
-        await newOwnsignal.mockUpdate(callback());
-    });
-
-    if (typeof inputFirstSignal !== 'string' && typeof inputFirstSignal !== 'number' && typeof inputFirstSignal !== 'boolean' && inputFirstSignal !== null && inputFirstSignal !== undefined) {
-        inputFirstSignal.monitor().subscribe(async () => {
-            await newOwnsignal.mockUpdate(callback());
-        });
-    }
-
-    if (typeof inputSecondSignal !== 'string' && typeof inputSecondSignal !== 'number' && typeof inputSecondSignal !== 'boolean' && inputSecondSignal !== null && inputSecondSignal !== undefined) {
-        inputSecondSignal.monitor().subscribe(async () => {
-            await newOwnsignal.mockUpdate(callback());
-        });
-    }
-}
-
-var BoolSignalMock$1 = BoolSignalMock;
-
 class QuaternionSignalMock extends SignalMock {
     /**
      * @param {Quaternion} value
@@ -559,7 +241,7 @@ class QuaternionSignalMock extends SignalMock {
 
         let newSignal = new ScalarSignalMock$1(callback());
 
-        monitor$4(this, signal, null, newSignal, callback);
+        monitor$6(this, signal, null, newSignal, callback);
         return newSignal;
     }
 
@@ -574,7 +256,7 @@ class QuaternionSignalMock extends SignalMock {
 
         let newSignal = new QuaternionSignalMock(callback());
 
-        monitor$4(this, null, null, newSignal, callback);
+        monitor$6(this, null, null, newSignal, callback);
 
         return newSignal;
     }
@@ -592,7 +274,7 @@ class QuaternionSignalMock extends SignalMock {
 
         let newSignal = new ScalarSignalMock$1(callback());
 
-        monitor$4(this, signal, null, newSignal, callback);
+        monitor$6(this, signal, null, newSignal, callback);
         return newSignal;
     }
 
@@ -612,7 +294,7 @@ class QuaternionSignalMock extends SignalMock {
 
         let newSignal = new QuaternionSignalMock(callback());
 
-        monitor$4(this, null, null, newSignal, callback);
+        monitor$6(this, null, null, newSignal, callback);
         return newSignal;
     }
 
@@ -629,7 +311,7 @@ class QuaternionSignalMock extends SignalMock {
 
         let newSignal = new QuaternionSignalMock(callback());
 
-        monitor$4(this, signal, null, newSignal, callback);
+        monitor$6(this, signal, null, newSignal, callback);
         return newSignal;
     }
 
@@ -801,7 +483,7 @@ class QuaternionSignalMock extends SignalMock {
  * @param {SignalMock} newOwnsignal
  * @param {Function} callback
  */
-function monitor$4(outputSignal, inputFirstSignal, inputSecondSignal, newOwnsignal, callback) {
+function monitor$6(outputSignal, inputFirstSignal, inputSecondSignal, newOwnsignal, callback) {
     outputSignal.monitor().subscribe(async () => {
         await newOwnsignal.mockUpdate(callback());
     });
@@ -909,7 +591,7 @@ class VectorSignalMock extends SignalMock {
             this.monitor().subscribe(async () => {
                 await newSignal.mockUpdate(callback());
             });
-        } else monitor$3(this, signal, newSignal, callback);
+        } else monitor$5(this, signal, newSignal, callback);
 
         return newSignal;
     }
@@ -938,7 +620,7 @@ class VectorSignalMock extends SignalMock {
             this.monitor().subscribe(async () => {
                 await newSignal.mockUpdate(callback());
             });
-        } else monitor$3(this, signal, newSignal, callback);
+        } else monitor$5(this, signal, newSignal, callback);
 
         return newSignal;
     }
@@ -969,7 +651,7 @@ class VectorSignalMock extends SignalMock {
             this.monitor().subscribe(async () => {
                 await newSignal.mockUpdate(callback());
             });
-        } else monitor$3(this, signal, newSignal, callback);
+        } else monitor$5(this, signal, newSignal, callback);
 
         return newSignal;
     }
@@ -1004,7 +686,7 @@ class VectorSignalMock extends SignalMock {
             this.monitor().subscribe(async () => {
                 await newSignal.mockUpdate(callback());
             });
-        } else monitor$3(this, signal, newSignal, callback);
+        } else monitor$5(this, signal, newSignal, callback);
 
         return newSignal;
     }
@@ -1034,7 +716,7 @@ class VectorSignalMock extends SignalMock {
             this.monitor().subscribe(async () => {
                 await newSignal.mockUpdate(callback());
             });
-        } else monitor$3(this, signal, newSignal, callback);
+        } else monitor$5(this, signal, newSignal, callback);
 
         return newSignal;
     }
@@ -1155,7 +837,7 @@ class VectorSignalMock extends SignalMock {
             this.monitor().subscribe(async () => {
                 await newSignal.mockUpdate(callback());
             });
-        } else monitor$3(this, signal, newSignal, callback);
+        } else monitor$5(this, signal, newSignal, callback);
 
         return newSignal;
     }
@@ -1183,7 +865,7 @@ class VectorSignalMock extends SignalMock {
             this.monitor().subscribe(async () => {
                 await newSignal.mockUpdate(callback());
             });
-        } else monitor$3(this, signal, newSignal, callback);
+        } else monitor$5(this, signal, newSignal, callback);
 
         return newSignal;
     }
@@ -1267,7 +949,7 @@ class VectorSignalMock extends SignalMock {
             this.monitor().subscribe(async () => {
                 await newSignal.mockUpdate(callback());
             });
-        } else monitor$3(this, signal, newSignal, callback);
+        } else monitor$5(this, signal, newSignal, callback);
 
         return newSignal;
     }
@@ -1413,11 +1095,11 @@ class VectorSignalMock extends SignalMock {
                     await newSignal.mockUpdate(callback());
                 });
             } else {
-                monitor$3(this, max, newSignal, callback);
+                monitor$5(this, max, newSignal, callback);
             }
         } else {
             if (max instanceof mathModule.Vector3 || typeof max === "number") {
-                monitor$3(this, min, newSignal, callback);
+                monitor$5(this, min, newSignal, callback);
             } else {
                 monitorForTwoArg$2(this, min, max, newSignal, callback);
             }
@@ -1453,7 +1135,7 @@ class VectorSignalMock extends SignalMock {
             this.monitor().subscribe(async () => {
                 await newSignal.mockUpdate(callback());
             });
-        } else monitor$3(this, vec, newSignal, callback);
+        } else monitor$5(this, vec, newSignal, callback);
 
         return newSignal;
     }
@@ -1541,11 +1223,11 @@ class VectorSignalMock extends SignalMock {
                     await newSignal.mockUpdate(callback());
                 });
             } else {
-                monitor$3(this, max, newSignal, callback);
+                monitor$5(this, max, newSignal, callback);
             }
         } else {
             if (typeof max === "number" || max instanceof mathModule.Vector3) {
-                monitor$3(this, min, newSignal, callback);
+                monitor$5(this, min, newSignal, callback);
             } else {
                 monitorForTwoArg$2(this, min, max, newSignal, callback);
             }
@@ -1646,11 +1328,11 @@ class VectorSignalMock extends SignalMock {
                     await newSignal.mockUpdate(callback());
                 });
             } else {
-                monitor$3(this, max, newSignal, callback);
+                monitor$5(this, max, newSignal, callback);
             }
         } else {
             if (typeof max === "number" || max instanceof mathModule.Vector3) {
-                monitor$3(this, min, newSignal, callback);
+                monitor$5(this, min, newSignal, callback);
             } else {
                 monitorForTwoArg$2(this, min, max, newSignal, callback);
             }
@@ -1686,7 +1368,7 @@ class VectorSignalMock extends SignalMock {
             this.monitor().subscribe(async () => {
                 await newSignal.mockUpdate(callback());
             });
-        } else monitor$3(this, vec, newSignal, callback);
+        } else monitor$5(this, vec, newSignal, callback);
 
         return newSignal;
     }
@@ -1718,7 +1400,7 @@ class VectorSignalMock extends SignalMock {
             this.monitor().subscribe(async () => {
                 await newSignal.mockUpdate(callback());
             });
-        } else monitor$3(this, vec, newSignal, callback);
+        } else monitor$5(this, vec, newSignal, callback);
 
         return newSignal;
     }
@@ -1753,7 +1435,7 @@ class VectorSignalMock extends SignalMock {
             this.monitor().subscribe(async () => {
                 await newSignal.mockUpdate(callback());
             });
-        } else monitor$3(this, vec, newSignal, callback);
+        } else monitor$5(this, vec, newSignal, callback);
 
         return newSignal;
     }
@@ -1776,7 +1458,7 @@ class VectorSignalMock extends SignalMock {
             this.monitor().subscribe(async () => {
                 await newSignal.mockUpdate(callback());
             });
-        } else monitor$3(this, vec, newSignal, callback);
+        } else monitor$5(this, vec, newSignal, callback);
 
         return newSignal;
     }
@@ -1814,7 +1496,7 @@ class VectorSignalMock extends SignalMock {
             this.monitor().subscribe(async () => {
                 await newSignal.mockUpdate(callback());
             });
-        } else monitor$3(this, signal, newSignal, callback);
+        } else monitor$5(this, signal, newSignal, callback);
 
         return newSignal;
     }
@@ -1839,7 +1521,7 @@ class VectorSignalMock extends SignalMock {
 
         let newSignal = new VectorSignalMock(callback());
 
-        monitor$3(this, signal, newSignal, callback);
+        monitor$5(this, signal, newSignal, callback);
 
         return newSignal;
     }
@@ -1962,11 +1644,11 @@ class VectorSignalMock extends SignalMock {
                     await newSignal.mockUpdate(callback());
                 });
             } else {
-                monitor$3(this, val2, newSignal, callback);
+                monitor$5(this, val2, newSignal, callback);
             }
         } else {
             if (val2 instanceof mathModule.Vector3 || typeof val2 === 'number') {
-                monitor$3(this, val1, newSignal, callback);
+                monitor$5(this, val1, newSignal, callback);
             } else {
                 monitorForTwoArg$2(this, val1, val2, newSignal, callback);
             }
@@ -2093,7 +1775,7 @@ class VectorSignalMock extends SignalMock {
  * @param {VectorSignalMock | ScalarSignalMock} signal
  * @param {Function} callback
  */
-function monitor$3(firstSignal, secondSignal, signal, callback) {
+function monitor$5(firstSignal, secondSignal, signal, callback) {
     firstSignal.monitor().subscribe(async () => {
         await signal.mockUpdate(callback());
     });
@@ -2202,7 +1884,7 @@ class Vec2SignalMock extends SignalMock {
             this.monitor().subscribe(async () => {
                 await newSignal.mockUpdate(callback());
             });
-        } else monitor$2(this, signal, newSignal, callback);
+        } else monitor$4(this, signal, newSignal, callback);
 
         return newSignal;
     }
@@ -2230,7 +1912,7 @@ class Vec2SignalMock extends SignalMock {
             this.monitor().subscribe(async () => {
                 await newSignal.mockUpdate(callback());
             });
-        } else monitor$2(this, signal, newSignal, callback);
+        } else monitor$4(this, signal, newSignal, callback);
 
         return newSignal;
     }
@@ -2258,7 +1940,7 @@ class Vec2SignalMock extends SignalMock {
             this.monitor().subscribe(async () => {
                 await newSignal.mockUpdate(callback());
             });
-        } else monitor$2(this, signal, newSignal, callback);
+        } else monitor$4(this, signal, newSignal, callback);
 
         return newSignal;
     }
@@ -2286,7 +1968,7 @@ class Vec2SignalMock extends SignalMock {
             this.monitor().subscribe(async () => {
                 await newSignal.mockUpdate(callback());
             });
-        } else monitor$2(this, signal, newSignal, callback);
+        } else monitor$4(this, signal, newSignal, callback);
 
         return newSignal;
     }
@@ -2314,7 +1996,7 @@ class Vec2SignalMock extends SignalMock {
             this.monitor().subscribe(async () => {
                 await newSignal.mockUpdate(callback());
             });
-        } else monitor$2(this, signal, newSignal, callback);
+        } else monitor$4(this, signal, newSignal, callback);
 
         return newSignal;
     }
@@ -2390,7 +2072,7 @@ class Vec2SignalMock extends SignalMock {
             this.monitor().subscribe(async () => {
                 await newSignal.mockUpdate(callback());
             });
-        } else monitor$2(this, signal, newSignal, callback);
+        } else monitor$4(this, signal, newSignal, callback);
 
         return newSignal;
     }
@@ -2511,11 +2193,11 @@ class Vec2SignalMock extends SignalMock {
                     await newSignal.mockUpdate(callback());
                 });
             } else {
-                monitor$2(this, max, newSignal, callback);
+                monitor$4(this, max, newSignal, callback);
             }
         } else {
             if (max instanceof mathModule.Vector2 || typeof max === "number") {
-                monitor$2(this, min, newSignal, callback);
+                monitor$4(this, min, newSignal, callback);
             } else {
                 monitorForTwoArg$1(this, min, max, newSignal, callback);
             }
@@ -2544,7 +2226,7 @@ class Vec2SignalMock extends SignalMock {
             this.monitor().subscribe(async () => {
                 await newSignal.mockUpdate(callback());
             });
-        } else monitor$2(this, vector, newSignal, callback);
+        } else monitor$4(this, vector, newSignal, callback);
 
         return newSignal;
     }
@@ -2597,7 +2279,7 @@ class Vec2SignalMock extends SignalMock {
             this.monitor().subscribe(async () => {
                 await newSignal.mockUpdate(callback());
             });
-        } else monitor$2(this, vector, newSignal, callback);
+        } else monitor$4(this, vector, newSignal, callback);
 
         return newSignal;
     }
@@ -2622,7 +2304,7 @@ class Vec2SignalMock extends SignalMock {
             this.monitor().subscribe(async () => {
                 await newSignal.mockUpdate(callback());
             });
-        } else monitor$2(this, vector, newSignal, callback);
+        } else monitor$4(this, vector, newSignal, callback);
 
         return newSignal;
     }
@@ -2653,7 +2335,7 @@ class Vec2SignalMock extends SignalMock {
             this.monitor().subscribe(async () => {
                 await newSignal.mockUpdate(callback());
             });
-        } else monitor$2(this, vector, newSignal, callback);
+        } else monitor$4(this, vector, newSignal, callback);
 
         return newSignal;
     }
@@ -2674,7 +2356,7 @@ class Vec2SignalMock extends SignalMock {
             this.monitor().subscribe(async () => {
                 await newSignal.mockUpdate(callback());
             });
-        } else monitor$2(this, signal, newSignal, callback);
+        } else monitor$4(this, signal, newSignal, callback);
 
         return newSignal;
     }
@@ -2716,7 +2398,7 @@ class Vec2SignalMock extends SignalMock {
             this.monitor().subscribe(async () => {
                 await newSignal.mockUpdate(callback());
             });
-        } else monitor$2(this, signal, newSignal, callback);
+        } else monitor$4(this, signal, newSignal, callback);
 
         return newSignal;
     }
@@ -2744,7 +2426,7 @@ class Vec2SignalMock extends SignalMock {
             this.monitor().subscribe(async () => {
                 await newSignal.mockUpdate(callback());
             });
-        } else monitor$2(this, signal, newSignal, callback);
+        } else monitor$4(this, signal, newSignal, callback);
 
         return newSignal;
     }
@@ -2878,11 +2560,11 @@ class Vec2SignalMock extends SignalMock {
                     await newSignal.mockUpdate(callback());
                 });
             } else {
-                monitor$2(this, max, newSignal, callback);
+                monitor$4(this, max, newSignal, callback);
             }
         } else {
             if (typeof max === "number" || max instanceof mathModule.Vector2) {
-                monitor$2(this, min, newSignal, callback);
+                monitor$4(this, min, newSignal, callback);
             } else {
                 monitorForTwoArg$1(this, min, max, newSignal, callback);
             }
@@ -2972,11 +2654,11 @@ class Vec2SignalMock extends SignalMock {
                     await newSignal.mockUpdate(callback());
                 });
             } else {
-                monitor$2(this, max, newSignal, callback);
+                monitor$4(this, max, newSignal, callback);
             }
         } else {
             if (typeof max === "number" || max instanceof mathModule.Vector2) {
-                monitor$2(this, min, newSignal, callback);
+                monitor$4(this, min, newSignal, callback);
             } else {
                 monitorForTwoArg$1(this, min, max, newSignal, callback);
             }
@@ -3080,11 +2762,11 @@ class Vec2SignalMock extends SignalMock {
                     await newSignal.mockUpdate(callback());
                 });
             } else {
-                monitor$2(this, val2, newSignal, callback);
+                monitor$4(this, val2, newSignal, callback);
             }
         } else {
             if (val2 instanceof mathModule.Vector2 || typeof val2 === 'number') {
-                monitor$2(this, val1, newSignal, callback);
+                monitor$4(this, val1, newSignal, callback);
             } else {
                 monitorForTwoArg$1(this, val1, val2, newSignal, callback);
             }
@@ -3188,7 +2870,7 @@ class Vec2SignalMock extends SignalMock {
  * @param {ScalarSignalMock | Vec2SignalMock} signal
  * @param {Function} callback
  */
-function monitor$2(firstSignal, secondSignal, signal, callback) {
+function monitor$4(firstSignal, secondSignal, signal, callback) {
     firstSignal.monitor().subscribe(async () => {
         await signal.mockUpdate(callback());
     });
@@ -3268,7 +2950,7 @@ class ScalarSignalMock extends SignalMock {
             newSignal = new VectorSignalMock(callback());
         }
         
-        monitor$1(this, signal, newSignal, callback);
+        monitor$3(this, signal, newSignal, callback);
 
         return newSignal;
     }
@@ -3312,7 +2994,7 @@ class ScalarSignalMock extends SignalMock {
             newSignal = new VectorSignalMock(callback());
         }
         
-        monitor$1(this, signal, newSignal, callback);
+        monitor$3(this, signal, newSignal, callback);
 
         return newSignal;
     }
@@ -3356,7 +3038,7 @@ class ScalarSignalMock extends SignalMock {
             newSignal = new VectorSignalMock(callback());
         }
         
-        monitor$1(this, signal, newSignal, callback);
+        monitor$3(this, signal, newSignal, callback);
 
         return newSignal;
     }
@@ -3400,7 +3082,7 @@ class ScalarSignalMock extends SignalMock {
             newSignal = new VectorSignalMock(callback());
         }
         
-        monitor$1(this, signal, newSignal, callback);
+        monitor$3(this, signal, newSignal, callback);
 
         return newSignal;
     }
@@ -3417,7 +3099,7 @@ class ScalarSignalMock extends SignalMock {
         
         let newSignal = new ScalarSignalMock(callback());
 
-        monitor$1(this, signal, newSignal, callback);
+        monitor$3(this, signal, newSignal, callback);
 
         return newSignal;
     }
@@ -3434,7 +3116,7 @@ class ScalarSignalMock extends SignalMock {
         
         let newSignal = new ScalarSignalMock(callback());
 
-        monitor$1(this, signal, newSignal, callback);
+        monitor$3(this, signal, newSignal, callback);
 
         return newSignal;
     }
@@ -3559,7 +3241,7 @@ class ScalarSignalMock extends SignalMock {
             newSignal = new VectorSignalMock(callback());
         }
         
-        monitor$1(this, signal, newSignal, callback);
+        monitor$3(this, signal, newSignal, callback);
 
         return newSignal;
     }
@@ -3710,11 +3392,11 @@ class ScalarSignalMock extends SignalMock {
                     await newSignal.mockUpdate(callback());
                 });
             } else {
-                monitor$1(this, max, newSignal, callback);
+                monitor$3(this, max, newSignal, callback);
             }
         } else {
             if(max instanceof mathModule.Vector2 || max instanceof mathModule.Vector3 || typeof max === "number") {
-                monitor$1(this, min, newSignal, callback);
+                monitor$3(this, min, newSignal, callback);
             } else {
                 monitorForTwoArg(this, min, max, newSignal, callback);
             }
@@ -3834,11 +3516,11 @@ class ScalarSignalMock extends SignalMock {
                     await newSignal.mockUpdate(callback());
                 });
             } else {
-                monitor$1(this, max, newSignal, callback);
+                monitor$3(this, max, newSignal, callback);
             }
         } else {
             if (typeof max === "number" || max instanceof mathModule.Vector2 || max instanceof mathModule.Vector3) {
-                monitor$1(this, min, newSignal, callback);
+                monitor$3(this, min, newSignal, callback);
             } else {
                 monitorForTwoArg(this, min, max, newSignal, callback);
             }
@@ -3946,11 +3628,11 @@ class ScalarSignalMock extends SignalMock {
                     await newSignal.mockUpdate(callback());
                 });
             } else {
-                monitor$1(this, max, newSignal, callback);
+                monitor$3(this, max, newSignal, callback);
             }
         } else {
             if (typeof max === "number" || max instanceof mathModule.Vector2 || max instanceof mathModule.Vector3) {
-                monitor$1(this, min, newSignal, callback);
+                monitor$3(this, min, newSignal, callback);
             } else {
                 monitorForTwoArg(this, min, max, newSignal, callback);
             }
@@ -3972,7 +3654,7 @@ class ScalarSignalMock extends SignalMock {
         
         let newSignal = new BoolSignalMock$1(callback());
 
-        monitor$1(this, signal, newSignal, callback);
+        monitor$3(this, signal, newSignal, callback);
 
         return newSignal;
     }
@@ -3990,7 +3672,7 @@ class ScalarSignalMock extends SignalMock {
         
         let newSignal = new BoolSignalMock$1(callback());
 
-        monitor$1(this, signal, newSignal, callback);
+        monitor$3(this, signal, newSignal, callback);
 
         return newSignal;
     }
@@ -4008,7 +3690,7 @@ class ScalarSignalMock extends SignalMock {
         
         let newSignal = new BoolSignalMock$1(callback());
 
-        monitor$1(this, signal, newSignal, callback);
+        monitor$3(this, signal, newSignal, callback);
 
         return newSignal;
     }
@@ -4026,7 +3708,7 @@ class ScalarSignalMock extends SignalMock {
         
         let newSignal = new BoolSignalMock$1(callback());
 
-        monitor$1(this, signal, newSignal, callback);
+        monitor$3(this, signal, newSignal, callback);
 
         return newSignal;
     }
@@ -4044,7 +3726,7 @@ class ScalarSignalMock extends SignalMock {
         
         let newSignal = new BoolSignalMock$1(callback());
 
-        monitor$1(this, signal, newSignal, callback);
+        monitor$3(this, signal, newSignal, callback);
 
         return newSignal;
     }
@@ -4062,7 +3744,7 @@ class ScalarSignalMock extends SignalMock {
         
         let newSignal = new BoolSignalMock$1(callback());
 
-        monitor$1(this, signal, newSignal, callback);
+        monitor$3(this, signal, newSignal, callback);
 
         return newSignal;
     }
@@ -4181,7 +3863,7 @@ class ScalarSignalMock extends SignalMock {
         };
         let newSignal = new ScalarSignalMock(callback());
 
-        monitor$1(this, scalar, newSignal, callback);
+        monitor$3(this, scalar, newSignal, callback);
         
         return newSignal;
     }
@@ -4196,7 +3878,7 @@ class ScalarSignalMock extends SignalMock {
         };
         let newSignal = new ScalarSignalMock(callback());
 
-        monitor$1(this, scalar, newSignal, callback);
+        monitor$3(this, scalar, newSignal, callback);
         
         return newSignal;
     }
@@ -4220,11 +3902,11 @@ class ScalarSignalMock extends SignalMock {
                     await newSignal.mockUpdate(callback());
                 });
             } else {
-                monitor$1(this, factor, newSignal, callback);
+                monitor$3(this, factor, newSignal, callback);
             }
         } else {
             if(typeof factor === "number") {
-                monitor$1(this, scalar, newSignal, callback);
+                monitor$3(this, scalar, newSignal, callback);
             } else {
                 monitorForTwoArg(this, scalar, factor, newSignal, callback);
             }
@@ -4260,11 +3942,11 @@ class ScalarSignalMock extends SignalMock {
                     await newSignal.mockUpdate(callback());
                 });
             } else {
-                monitor$1(this, max, newSignal, callback);
+                monitor$3(this, max, newSignal, callback);
             }
         } else {
             if(typeof max === "number") {
-                monitor$1(this, min, newSignal, callback);
+                monitor$3(this, min, newSignal, callback);
             } else {
                 monitorForTwoArg(this, min, max, newSignal, callback);
             }
@@ -4330,7 +4012,7 @@ class ScalarSignalMock extends SignalMock {
  * @param {ScalarSignalMock | BoolSignalMock | Vec2SignalMock | VectorSignalMock} signal
  * @param {Function} callback
  */
-function monitor$1(firstSignal, secondSignal, signal, callback) {
+function monitor$3(firstSignal, secondSignal, signal, callback) {
     firstSignal.monitor().subscribe(async () => {
         await signal.mockUpdate(callback());
     });
@@ -4369,1762 +4051,360 @@ function monitorForTwoArg(firstSignal, secondSignal, thirdSignal, signal, callba
 
 var ScalarSignalMock$1 = ScalarSignalMock;
 
-const ms = new ScalarSignalMock$1(0);
-const deltaTimeMS = new ScalarSignalMock$1(0);
-
-ms.monitor().subscribe(async (/** @type {{ newValue: number; oldValue: number; }} */ v) => {
-    await deltaTimeMS.mockUpdate(v.newValue - v.oldValue);
-});
-
-/** @type {SubscriptionMock[]} */
-let subscriptions = [];
-
-class TimeMock {
-    static get deltaTimeMS() {
-        return deltaTimeMS;
-    }
-
-    static get ms() {
-        return ms;
-    }
-
+class BoolSignalMock extends SignalMock {
     /**
-     * @static
-     * @param {SubscriptionMock} subcription
-     * @memberof TimeMock
-     */
-    static clearInterval(subcription) {
-        subcription.unsubscribe();
-    }
-
-    /**
-     * @static
-     * @param {SubscriptionMock} subcription
-     * @memberof TimeMock
-     */
-    static clearTimeout(subcription) {
-        subcription.unsubscribe();
-    }
-
-    /**
-     * @static
-     * @param {Function} callback
-     * @param {number} delay
-     * @memberof TimeMock
-     */
-    static setInterval(callback, delay) {
-        return TimeMock.setIntervalWithSnapshot(undefined, callback, delay)
-    }
-
-    /**
-     *
-     *
-     * @static
-     * @param {*} snapshot
-     * @param {Function} callback
-     * @param {number} delay
-     * @return {*} 
-     * @memberof TimeMock
-     */
-    static setIntervalWithSnapshot(snapshot, callback, delay) {
-        let deltatime = 0;
-
-        let sub = ms.monitor().subscribeWithSnapshot(snapshot, (/** @type {{ newValue: number; oldValue: number; }} */ v) => {
-            deltatime += v.newValue - v.oldValue;
-            let times = Math.floor(deltatime / delay);
-
-            if (times >= 1) {
-                deltatime -= delay * times;
-
-                for (let i = 0; i < times; i++) callback();
-            }
-        });
-
-        subscriptions.push(sub);
-
-        return sub;
-    }
-
-    /**
-     * @static
-     * @param {Function} callback
-     * @param {number} delay
-     * @memberof TimeMock
-     */
-    static setTimeout(callback, delay) {
-        return TimeMock.setTimeoutWithSnapshot(undefined, callback, delay);
-    }
-
-    /**
-     * @static
-     * @param {*} snapshot
-     * @param {Function} callback
-     * @param {number} delay
-     * @memberof TimeMock
-     */
-    static setTimeoutWithSnapshot(snapshot, callback, delay) {
-        let deltatime = 0;
-
-        let sub = ms.monitor().subscribeWithSnapshot(snapshot, (/** @type {{ newValue: number; oldValue: number; }} */ v) => {
-            deltatime += v.newValue - v.oldValue;
-
-            if (deltatime >= delay) {
-                callback();
-                sub.unsubscribe();
-            }
-        });
-
-        subscriptions.push(sub);
-
-        return sub;
-    }
-
-    /**
-     * @static
-     * @param {number} number
-     * @memberof TimeMock
-     */
-    static async mockIncreaseMs(number) {
-        await ms.mockUpdate(ms.value + number);
-    }
-
-    static async mockReset() {
-        await ms.mockUpdate(0);
-        await deltaTimeMS.mockUpdate(0);
-
-        subscriptions.forEach(sub => sub.unsubscribe());
-        subscriptions = [];
-    }
-}
-
-class TimeDriverMock {
-    /**
-     * @param {number} durationMilliseconds
-     * @param {number} loopCount
-     * @param {boolean} mirror
-     * @memberof TimeDriverMock
-     */
-    constructor(durationMilliseconds, loopCount, mirror) {
-        this.durationMilliseconds = durationMilliseconds;
-        this.loopCount = loopCount;
-        this.mirror = mirror;
-
-        this._isRunning = new BoolSignalMock$1(false);
-
-        this.progress = new ScalarSignalMock$1(0);
-        this._reverse = false;
-        this._loop = 0;
-        this._updateSubscription = null;
-
-        this._onCompleted = new EventSourceMock();
-        this._onAfterIteration = new EventSourceMock();
-    }
-
-    start() {
-        if (this._isRunning.value) return;
-
-        this._updateSubscription = TimeMock.ms.monitor().subscribe(async (/** @type {{ newValue: number; oldValue: number; }} */ v) => {
-            await this._update(v.newValue - v.oldValue);
-        });
-
-        this._isRunning.mockUpdate(true);
-    }
-
-    stop() {
-        if (this._updateSubscription) this._updateSubscription.unsubscribe();
-
-        this._isRunning.mockUpdate(false);
-    }
-
-    reset() {
-        this.progress.mockUpdate(0);
-        this._reverse = false;
-        this._loop = 0;
-    }
-
-    reverse() {
-        this._reverse = !this._reverse;
-        this._loop = this.loopCount - this._loop - 1;
-    }
-
-    isRunning() {
-        return this._isRunning;
-    }
-
-    onCompleted() {
-        return this._onCompleted;
-    }
-
-    onAfterIteration() {
-        return this._onAfterIteration;
-    }
-
-    /**
-     * @param {number} deltatime
-     * @memberof TimeDriverMock
-     */
-    async _update(deltatime) {
-        if (!this._isRunning.value) return;
-
-        let progress = this.progress.value;
-        
-        if (this._reverse)
-            progress = progress - (deltatime / this.durationMilliseconds);
-        else
-            progress = progress + (deltatime / this.durationMilliseconds);
-
-        while (!(progress < 1 && progress >= 0)) {
-            this._loop += 1;
-
-            if (this.loopCount <= this._loop) {
-                await this._isRunning.mockUpdate(false);
-                await this._onCompleted.mockCallback();
-
-                await this._onAfterIteration.mockCallback();
-                break;
-            } else {
-                if (this.mirror) {
-                    this._reverse = !this._reverse;
-
-                    if (progress < 0) progress = Math.abs(progress);
-                    else progress = 1 - (progress - 1);
-
-                } else {
-                    if (progress < 0) progress = Math.abs(progress);
-                
-                    progress -= 1;
-                }
-            }
-            await this._onAfterIteration.mockCallback();
-        }
-
-        await this.progress.mockUpdate(progress);
-    }
-}
-
-class AnimationMock {
-    /**
-     * @static
-     * @param {{durationMilliseconds?: number, loopCount?: number, mirror?: false | true}} params
-     * @memberof AnimationMock
-     */
-    static timeDriver(params) {
-        let durationMilliseconds = params.durationMilliseconds ? params.durationMilliseconds : 0;
-        let loopCount = params.loopCount ? params.loopCount : 0;
-        let mirror = params.mirror ? params.mirror : false;
-
-        return new TimeDriverMock(durationMilliseconds, loopCount, mirror);
-    }
-
-    /**
-     * @static
-     * @param {TimeDriver} driver
-     * @param {ScalarSampler} sampler
-     * @memberof AnimationMock
-     */
-    static animate(driver, sampler) {
-        let scalar = new ScalarSignalMock$1(0);
-
-        driver.progress.monitor({ fireOnInitialValue: true }).subscribe(async () => {
-            await scalar.mockUpdate(sampler.curve(driver.progress.value));
-        });
-
-        return scalar;
-    }
-
-    static get samplers() {
-        return SamplerFactory
-    }
-}
-
-class ScalarSampler {
-    /**
-     * @param {Function} curve
-     * @memberof ScalarSampler
-     */
-    constructor(curve) {
-        this.curve = curve;
-    }
-}
-
-class SamplerFactory {
-    /**
-    * @static
-    * @param {number | number[]} from
-    * @param {number | number[]} to
-    * @returns {ScalarSampler | ScalarSampler[]}
-    * @memberof SamplerFactory
-    */
-    static linear(from, to) {
-        if (typeof from === 'number' && typeof to === 'number')
-            return new ScalarSampler((/** @type {number} */ t) => mathModule.AMath.lerp(from, to, t))
-        else {
-            // @ts-ignore
-            return from.map((e, index) => this.linear(e, to[index]))
-        }
-    }
-
-    /**
-    * @static
-    * @param {number | number[]} numberOfFrames
-    * @param {number | number[]} [startFrame = null] 
-    * @returns {ScalarSampler | ScalarSampler[]}
-    * @memberof SamplerFactory
-    */
-    static frame(numberOfFrames, startFrame) {
-        if (typeof numberOfFrames === 'number' && typeof startFrame === 'number') {
-            let startFrameValue = startFrame ?? 0;
-            return new ScalarSampler((/** @type {number} */ t) => Math.round(mathModule.AMath.lerp(0, numberOfFrames, t) + startFrameValue))
-        }
-        else {
-            // @ts-ignore
-            return numberOfFrames.map((e, index) => this.frame(e, startFrame[index]) ?? this.frame(e))
-        }
-    }
-
-    /**
-    * @static
-    * @param {number | number[]} from
-    * @param {number | number[]} to
-    * @returns {ScalarSampler | ScalarSampler[]}
-    * @memberof SamplerFactory
-    */
-    static easeInSine(from, to) {
-        if (typeof from === 'number' && typeof to === 'number') {
-            return new ScalarSampler((/** @type {number} */ x) => {
-                let t = 1 - Math.cos((x * Math.PI) / 2);
-                return mathModule.AMath.lerp(from, to, t)
-            })
-        } else {
-                // @ts-ignore
-                return from.map((e, index) => this.easeInSine(e, to[index]))
-        }
-    }
-
-    /**
-    * @static
-    * @param {number | number[]} from
-    * @param {number | number[]} to
-    * @returns {ScalarSampler | ScalarSampler[]}
-    * @memberof SamplerFactory
-    */
-    static easeOutSine(from, to) {
-        if (typeof from === 'number' && typeof to === 'number') {
-            return new ScalarSampler((/** @type {number} */ x) => {
-                let t = Math.sin((x * Math.PI) / 2);
-                return mathModule.AMath.lerp(from, to, t)
-            })
-        } else {
-                // @ts-ignore
-                return from.map((e, index) => this.easeOutSine(e, to[index]))
-        }
-    }
-
-    /**
-    * @static
-    * @param {number | number[]} from
-    * @param {number | number[]} to
-    * @returns {ScalarSampler | ScalarSampler[]}
-    * @memberof SamplerFactory
-    */
-    static easeInOutSine(from, to) {
-        if (typeof from === 'number' && typeof to === 'number') {
-            return new ScalarSampler((/** @type {number} */ x) => {
-                let t = -(Math.cos(Math.PI * x) - 1) / 2;
-                return mathModule.AMath.lerp(from, to, t)
-            })
-        } else {
-                // @ts-ignore
-                return from.map((e, index) => this.easeInOutSine(e, to[index]))
-        }
-    }
-
-    /**
-    * @static
-    * @param {number | number[]} from
-    * @param {number | number[]} to
-    * @returns {ScalarSampler | ScalarSampler[]}
-    * @memberof SamplerFactory
-    */
-    static easeInQuad(from, to) {
-        if (typeof from === 'number' && typeof to === 'number') {
-            return new ScalarSampler((/** @type {number} */ x) => {
-                let t = x * x;
-                return mathModule.AMath.lerp(from, to, t)
-            })
-        } else {
-                // @ts-ignore
-                return from.map((e, index) => this.easeInQuad(e, to[index]))
-        }
-    }
-
-    /**
-    * @static
-    * @param {number | number[]} from
-    * @param {number | number[]} to
-    * @returns {ScalarSampler | ScalarSampler[]}
-    * @memberof SamplerFactory
-    */
-    static easeOutQuad(from, to) {
-        if (typeof from === 'number' && typeof to === 'number') {
-            return new ScalarSampler((/** @type {number} */ x) => {
-                let t = 1 - (1 - x) * (1 - x);
-                return mathModule.AMath.lerp(from, to, t)
-            })
-        } else {
-                // @ts-ignore
-                return from.map((e, index) => this.easeOutQuad(e, to[index]))
-        }
-    }
-
-    /**
-    * @static
-    * @param {number | number[]} from
-    * @param {number | number[]} to
-    * @returns {ScalarSampler | ScalarSampler[]}
-    * @memberof SamplerFactory
-    */
-    static easeInOutQuad(from, to) {
-        if (typeof from === 'number' && typeof to === 'number') {
-            return new ScalarSampler((/** @type {number} */ x) => {
-                let t = x < 0.5 ? 2 * x * x : 1 - Math.pow(-2 * x + 2, 2) / 2;
-                return mathModule.AMath.lerp(from, to, t)
-            })
-        } else {
-                // @ts-ignore
-                return from.map((e, index) => this.easeInOutQuad(e, to[index]))
-        }
-    }
-
-    /**
-    * @static
-    * @param {number | number[]} from
-    * @param {number | number[]} to
-    * @returns {ScalarSampler | ScalarSampler[]}
-    * @memberof SamplerFactory
-    */
-    static easeInCubic(from, to) {
-        if (typeof from === 'number' && typeof to === 'number') {
-            return new ScalarSampler((/** @type {number} */ x) => {
-                let t = x * x * x;
-                return mathModule.AMath.lerp(from, to, t)
-            })
-        } else {
-                // @ts-ignore
-                return from.map((e, index) => this.easeInCubic(e, to[index]))
-        }
-    }
-
-    /**
-    * @static
-    * @param {number | number[]} from
-    * @param {number | number[]} to
-    * @returns {ScalarSampler | ScalarSampler[]}
-    * @memberof SamplerFactory
-    */
-    static easeOutCubic(from, to) {
-        if (typeof from === 'number' && typeof to === 'number') {
-            return new ScalarSampler((/** @type {number} */ x) => {
-                let t = 1 - Math.pow(1 - x, 3);
-                return mathModule.AMath.lerp(from, to, t)
-            })
-        } else {
-                // @ts-ignore
-                return from.map((e, index) => this.easeOutCubic(e, to[index]))
-        }
-    }
-
-    /**
-    * @static
-    * @param {number | number[]} from
-    * @param {number | number[]} to
-    * @returns {ScalarSampler | ScalarSampler[]}
-    * @memberof SamplerFactory
-    */
-    static easeInOutCubic(from, to) {
-        if (typeof from === 'number' && typeof to === 'number') {
-            return new ScalarSampler((/** @type {number} */ x) => {
-                let t = x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
-                return mathModule.AMath.lerp(from, to, t)
-            })
-        } else {
-                // @ts-ignore
-                return from.map((e, index) => this.easeInOutCubic(e, to[index]))
-        }
-    }
-
-    /**
-    * @static
-    * @param {number | number[]} from
-    * @param {number | number[]} to
-    * @returns {ScalarSampler | ScalarSampler[]}
-    * @memberof SamplerFactory
-    */
-    static easeInQuart(from, to) {
-        if (typeof from === 'number' && typeof to === 'number') {
-            return new ScalarSampler((/** @type {number} */ x) => {
-                let t = x * x * x * x;
-                return mathModule.AMath.lerp(from, to, t)
-            })
-        } else {
-                // @ts-ignore
-                return from.map((e, index) => this.easeInQuart(e, to[index]))
-        }
-    }
-
-    /**
-    * @static
-    * @param {number | number[]} from
-    * @param {number | number[]} to
-    * @returns {ScalarSampler | ScalarSampler[]}
-    * @memberof SamplerFactory
-    */
-    static easeOutQuart(from, to) {
-        if (typeof from === 'number' && typeof to === 'number') {
-            return new ScalarSampler((/** @type {number} */ x) => {
-                let t = 1 - Math.pow(1 - x, 4);
-                return mathModule.AMath.lerp(from, to, t)
-            })
-        } else {
-                // @ts-ignore
-                return from.map((e, index) => this.lineaseOutQuartear(e, to[index]))
-        }
-    }
-
-    /**
-    * @static
-    * @param {number | number[]} from
-    * @param {number | number[]} to
-    * @returns {ScalarSampler | ScalarSampler[]}
-    * @memberof SamplerFactory
-    */
-    static easeInOutQuart(from, to) {
-        if (typeof from === 'number' && typeof to === 'number') {
-            return new ScalarSampler((/** @type {number} */ x) => {
-                let t = x < 0.5 ? 8 * x * x * x * x : 1 - Math.pow(-2 * x + 2, 4);
-                return mathModule.AMath.lerp(from, to, t)
-            })
-        } else {
-                // @ts-ignore
-                return from.map((e, index) => this.easeInOutQuart(e, to[index]))
-        }
-    }
-
-    /**
-    * @static
-    * @param {number | number[]} from
-    * @param {number | number[]} to
-    * @returns {ScalarSampler | ScalarSampler[]}
-    * @memberof SamplerFactory
-    */
-    static easeInQuint(from, to) {
-        if (typeof from === 'number' && typeof to === 'number') {
-            return new ScalarSampler((/** @type {number} */ x) => {
-                let t = x * x * x * x * x;
-                return mathModule.AMath.lerp(from, to, t)
-            })
-        } else {
-                // @ts-ignore
-                return from.map((e, index) => this.easeInQuint(e, to[index]))
-        }
-    }
-
-    /**
-    * @static
-    * @param {number | number[]} from
-    * @param {number | number[]} to
-    * @returns {ScalarSampler | ScalarSampler[]}
-    * @memberof SamplerFactory
-    */
-    static easeOutQuint(from, to) {
-        if (typeof from === 'number' && typeof to === 'number') {
-            return new ScalarSampler((/** @type {number} */ x) => {
-                let t = 1 - Math.pow(1 - x, 5);
-                return mathModule.AMath.lerp(from, to, t)
-            })
-        } else {
-                // @ts-ignore
-                return from.map((e, index) => this.easeOutQuint(e, to[index]))
-        }
-    }
-
-    /**
-    * @static
-    * @param {number | number[]} from
-    * @param {number | number[]} to
-    * @returns {ScalarSampler | ScalarSampler[]}
-    * @memberof SamplerFactory
-    */
-    static easeInOutQuint(from, to) {
-        if (typeof from === 'number' && typeof to === 'number') {
-            return new ScalarSampler((/** @type {number} */ x) => {
-                let t = x < 0.5 ? 16 * x * x * x * x * x : 1 - Math.pow(-2 * x + 2, 5) / 2;
-                return mathModule.AMath.lerp(from, to, t)
-            })
-        } else {
-                // @ts-ignore
-                return from.map((e, index) => this.easeInOutQuint(e, to[index]))
-        }
-    }
-
-    /**
-    * @static
-    * @param {number | number[]} from
-    * @param {number | number[]} to
-    * @returns {ScalarSampler | ScalarSampler[]}
-    * @memberof SamplerFactory
-    */
-    static easeInExpo(from, to) {
-        if (typeof from === 'number' && typeof to === 'number') {
-            return new ScalarSampler((/** @type {number} */ x) => {
-                let t = x === 0 ? 0 : Math.pow(2, 10 * x - 10);
-                return mathModule.AMath.lerp(from, to, t)
-            })
-        } else {
-                // @ts-ignore
-                return from.map((e, index) => this.easeInExpo(e, to[index]))
-        }
-    }
-
-    /**
-    * @static
-    * @param {number | number[]} from
-    * @param {number | number[]} to
-    * @returns {ScalarSampler | ScalarSampler[]}
-    * @memberof SamplerFactory
-    */
-    static easeOutExpo(from, to) {
-        if (typeof from === 'number' && typeof to === 'number') {
-            return new ScalarSampler((/** @type {number} */ x) => {
-                let t = x === 1 ? 1 : 1 - Math.pow(2, -10 * x);
-                return mathModule.AMath.lerp(from, to, t)
-            })
-        } else {
-                // @ts-ignore
-                return from.map((e, index) => this.easeOutExpo(e, to[index]))
-        }
-    }
-
-    /**
-    * @static
-    * @param {number | number[]} from
-    * @param {number | number[]} to
-    * @returns {ScalarSampler | ScalarSampler[]}
-    * @memberof SamplerFactory
-    */
-    static easeInOutExpo(from, to) {
-        if (typeof from === 'number' && typeof to === 'number') {
-            return new ScalarSampler((/** @type {number} */ x) => {
-                let t = x === 0
-                    ? 0
-                    : x === 1
-                        ? 1
-                        : x < 0.5 ? Math.pow(2, 20 * x - 10) / 2
-                            : (2 - Math.pow(2, -20 * x + 10)) / 2;
-
-                return mathModule.AMath.lerp(from, to, t)
-            })
-        } else {
-                // @ts-ignore
-                return from.map((e, index) => this.easeInOutExpo(e, to[index]))
-        }
-    }
-
-    /**
-    * @static
-    * @param {number | number[]} from
-    * @param {number | number[]} to
-    * @returns {ScalarSampler | ScalarSampler[]}
-    * @memberof SamplerFactory
-    */
-    static easeInCirc(from, to) {
-        if (typeof from === 'number' && typeof to === 'number') {
-            return new ScalarSampler((/** @type {number} */ x) => {
-                let t = 1 - Math.sqrt(1 - Math.pow(x, 2));
-                return mathModule.AMath.lerp(from, to, t)
-            })
-        } else {
-                // @ts-ignore
-                return from.map((e, index) => this.easeInCirc(e, to[index]))
-        }
-    }
-
-    /**
-    * @static
-    * @param {number | number[]} from
-    * @param {number | number[]} to
-    * @returns {ScalarSampler | ScalarSampler[]}
-    * @memberof SamplerFactory
-    */
-    static easeOutCirc(from, to) {
-        if (typeof from === 'number' && typeof to === 'number') {
-            return new ScalarSampler((/** @type {number} */ x) => {
-                let t = Math.sqrt(1 - Math.pow(x - 1, 2));
-                return mathModule.AMath.lerp(from, to, t)
-            })
-        } else {
-                // @ts-ignore
-                return from.map((e, index) => this.easeOutCirc(e, to[index]))
-        }
-    }
-
-    /**
-    * @static
-    * @param {number | number[]} from
-    * @param {number | number[]} to
-    * @returns {ScalarSampler | ScalarSampler[]}
-    * @memberof SamplerFactory
-    */
-    static easeInOutCirc(from, to) {
-        if (typeof from === 'number' && typeof to === 'number') {
-            return new ScalarSampler((/** @type {number} */ x) => {
-                let t = x < 0.5
-                    ? (1 - Math.sqrt(1 - Math.pow(2 * x, 2))) / 2
-                    : (Math.sqrt(1 - Math.pow(-2 * x + 2, 2)) + 1) / 2;
-
-                return mathModule.AMath.lerp(from, to, t)
-            })
-        } else {
-                // @ts-ignore
-                return from.map((e, index) => this.easeInOutCirc(e, to[index]))
-        }
-    }
-
-    /**
-    * @static
-    * @param {number | number[]} from
-    * @param {number | number[]} to
-    * @returns {ScalarSampler | ScalarSampler[]}
-    * @memberof SamplerFactory
-    */
-    static easeInBack(from, to) {
-        if (typeof from === 'number' && typeof to === 'number') {
-            return new ScalarSampler((/** @type {number} */ x) => {
-                let c1 = 1.70158;
-                let c3 = c1 + 1;
-                let t = c3 * x * x * x - c1 * x * x;
-
-                return mathModule.AMath.lerp(from, to, t)
-            })
-        } else {
-                // @ts-ignore
-                return from.map((e, index) => this.easeInBack(e, to[index]))
-        }
-    }
-    /**
-    * @static
-    * @param {number | number[]} from
-    * @param {number | number[]} to
-    * @returns {ScalarSampler | ScalarSampler[]}
-    * @memberof SamplerFactory
-    */
-    static easeOutBack(from, to) {
-        if (typeof from === 'number' && typeof to === 'number') {
-            return new ScalarSampler((/** @type {number} */ x) => {
-                let c1 = 1.70158;
-                let c3 = c1 + 1;
-                let t = 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2);
-
-                return mathModule.AMath.lerp(from, to, t)
-            })
-        } else {
-                // @ts-ignore
-                return from.map((e, index) => this.easeOutBack(e, to[index]))
-        }
-    }
-    /**
-    * @static
-    * @param {number | number[]} from
-    * @param {number | number[]} to
-    * @returns {ScalarSampler | ScalarSampler[]}
-    * @memberof SamplerFactory
-    */
-    static easeInOutBack(from, to) {
-        if (typeof from === 'number' && typeof to === 'number') {
-            return new ScalarSampler((/** @type {number} */ x) => {
-                let c1 = 1.70158;
-                let c2 = c1 * 1.525;
-                let t = x < 0.5
-                    ? (Math.pow(2 * x, 2) * ((c2 + 1) * 2 * x - c2)) / 2
-                    : (Math.pow(2 * x - 2, 2) * ((c2 + 1) * (x * 2 - 2) + c2) + 2) / 2;
-
-                return mathModule.AMath.lerp(from, to, t)
-            })
-        } else {
-                // @ts-ignore
-                return from.map((e, index) => this.easeInOutBack(e, to[index]))
-        }
-    }
-
-    /**
-    * @static
-    * @param {number | number[]} from
-    * @param {number | number[]} to
-    * @returns {ScalarSampler | ScalarSampler[]}
-    * @memberof SamplerFactory
-    */
-    static easeInElastic(from, to) {
-        if (typeof from === 'number' && typeof to === 'number') {
-            return new ScalarSampler((/** @type {number} */ x) => {
-                let t = x === 0
-                    ? 0
-                    : x === 1
-                        ? 1
-                        // @ts-ignore
-                        : -Math.pow(2, 10 * x - 10) * Math.sin((x * 10 - 10.75) * c4);
-
-                return mathModule.AMath.lerp(from, to, t)
-            })
-        } else {
-                // @ts-ignore
-                return from.map((e, index) => this.easeInElastic(e, to[index]))
-        }
-    }
-    /**
-    * @static
-    * @param {number | number[]} from
-    * @param {number | number[]} to
-    * @returns {ScalarSampler | ScalarSampler[]}
-    * @memberof SamplerFactory
-    */
-    static easeOutElastic(from, to) {
-        if (typeof from === 'number' && typeof to === 'number') {
-            return new ScalarSampler((/** @type {number} */ x) => {
-                let c4 = (2 * Math.PI) / 3;
-                let t = x === 0
-                    ? 0
-                    : x === 1
-                        ? 1
-                        : Math.pow(2, -10 * x) * Math.sin((x * 10 - 0.75) * c4) + 1;
-
-                return mathModule.AMath.lerp(from, to, t)
-            })
-        } else {
-                // @ts-ignore
-                return from.map((e, index) => this.easeOutElastic(e, to[index]))
-        }
-    }
-
-    /**
-    * @static
-    * @param {number | number[]} from
-    * @param {number | number[]} to
-    * @returns {ScalarSampler | ScalarSampler[]}
-    * @memberof SamplerFactory
-    */
-    static easeInOutElastic(from, to) {
-        if (typeof from === 'number' && typeof to === 'number') {
-            return new ScalarSampler((/** @type {number} */ x) => {
-                let c5 = (2 * Math.PI) / 4.5;
-                let t = x === 0
-                    ? 0
-                    : x === 1
-                        ? 1
-                        : x < 0.5
-                            ? -(Math.pow(2, 20 * x - 10) * Math.sin((20 * x - 11.125) * c5)) / 2
-                            : (Math.pow(2, -20 * x + 10) * Math.sin((20 * x - 11.125) * c5));
-
-                return mathModule.AMath.lerp(from, to, t)
-            })
-        } else {
-                // @ts-ignore
-                return from.map((e, index) => this.easeInOutElastic(e, to[index]))
-        }
-    }
-
-    /**
-    * @static
-    * @param {number | number[]} from
-    * @param {number | number[]} to
-    * @returns {ScalarSampler | ScalarSampler[]}
-    * @memberof SamplerFactory
-    */
-    static easeInBounce(from, to) {
-        if (typeof from === 'number' && typeof to === 'number') {
-            return new ScalarSampler((/** @type {number} */ x) => {
-                /**
-                 * @param {number} x 
-                 * @returns 
-                 */
-                function easeOutBounce(x) {
-                    let n1 = 7.5625;
-                    let d1 = 2.75;
-
-                    if (x < 1 / d1) {
-                        return n1 * x * x;
-                    } else if (x < 2 / d1) {
-                        return n1 * (x -= 1.5 / d1) * x + 0.75;
-                    } else if (x < 2.5 / d1) {
-                        return n1 * (x -= 2.25 / d1) * x + 0.9375;
-                    } else {
-                        return n1 * (x -= 2.625 / d1) * x + 0.984375;
-                    }
-                }
-                // @ts-ignore
-                function easeInBounce(x) {
-                    return 1 - easeOutBounce(1 - x);
-                }
-                let t = easeInBounce(x);
-
-                return mathModule.AMath.lerp(from, to, t)
-            })
-        } else {
-                // @ts-ignore
-                return from.map((e, index) => this.easeInBounce(e, to[index]))
-        }
-    }
-
-    /**
-    * @static
-    * @param {number | number[]} from
-    * @param {number | number[]} to
-    * @returns {ScalarSampler | ScalarSampler[]}
-    * @memberof SamplerFactory
-    */
-    static easeOutBounce(from, to) {
-        if (typeof from === 'number' && typeof to === 'number') {
-            return new ScalarSampler((/** @type {number} */ x) => {
-                /**
-                 * @param {number} x 
-                 * @returns 
-                 */
-                function easeOutBounce(x) {
-                    let n1 = 7.5625;
-                    let d1 = 2.75;
-
-                    if (x < 1 / d1) {
-                        return n1 * x * x;
-                    } else if (x < 2 / d1) {
-                        return n1 * (x -= 1.5 / d1) * x + 0.75;
-                    } else if (x < 2.5 / d1) {
-                        return n1 * (x -= 2.25 / d1) * x + 0.9375;
-                    } else {
-                        return n1 * (x -= 2.625 / d1) * x + 0.984375;
-                    }
-                }
-                let t = easeOutBounce(x);
-
-                return mathModule.AMath.lerp(from, to, t)
-            })
-        } else {
-                // @ts-ignore
-                return from.map((e, index) => this.easeOutBounce(e, to[index]))
-        }
-    }
-
-    /**
-    * @static
-    * @param {number | number[]} from
-    * @param {number | number[]} to
-    * @returns {ScalarSampler | ScalarSampler[]}
-    * @memberof SamplerFactory
-    */
-    static easeInOutBounce(from, to) {
-        if (typeof from === 'number' && typeof to === 'number') {
-            return new ScalarSampler((/** @type {number} */ x) => {
-                /**
-                 * @param {number} x 
-                 * @returns 
-                 */
-                function easeOutBounce(x) {
-                    let n1 = 7.5625;
-                    let d1 = 2.75;
-
-                    if (x < 1 / d1) {
-                        return n1 * x * x;
-                    } else if (x < 2 / d1) {
-                        return n1 * (x -= 1.5 / d1) * x + 0.75;
-                    } else if (x < 2.5 / d1) {
-                        return n1 * (x -= 2.25 / d1) * x + 0.9375;
-                    } else {
-                        return n1 * (x -= 2.625 / d1) * x + 0.984375;
-                    }
-                }
-                let t = x < 0.5
-                    ? (1 - easeOutBounce(1 - 2 * x)) / 2
-                    : (1 + easeOutBounce(2 * x - 1)) / 2;
-
-                return mathModule.AMath.lerp(from, to, t)
-            })
-        } else {
-                // @ts-ignore
-                return from.map((e, index) => this.easeInOutBounce(e, to[index]))
-        }
-    }
-
-    /**
-     * @static
-     * @param {number | number[]} value
-     * @memberof SamplerFactory
-     * @returns {ScalarSampler | ScalarSampler[]}
-     */
-    static constant(value) {
-        if (typeof value === 'number') {
-            // @ts-ignore
-            return new ScalarSampler((/** @type {number} */ t) => value)
-        } else {
-            if (value instanceof Array)
-                // @ts-ignore
-                return value.map((e) => this.constant(e))
-        }
-    }
-
-    /**
-     * @static
-     * @param {number | number[]} p0 
-     * @param {number | number[]} p1 
-     * @param {number | number[]} p2 
-     * @param {number | number[]} p3 
-     * @returns {ScalarSampler | ScalarSampler[]}
-     * @memberof SamplerFactory
-     */
-    static bezier(p0, p1, p2, p3) {
-        if (typeof p0 === 'number' && typeof p1 === 'number' && typeof p2 === 'number' && typeof p3 === 'number') {
-            // @ts-ignore
-            return new ScalarSampler((/** @type {number} */ t) => ((1 - t) ** 3) * p0 + 3.0 * t * ((1 - t) ** 2) * p1 + 3.0 * (t ** 2) * (1 - t) * p2.x + (t ** 3) * p3)
-        } else {
-            // @ts-ignore
-            if (p0.length == p1.length && p0.length == p2.length && p0.length == p3.length)
-                // @ts-ignore
-                return p0.map((e, index) => this.bezier(e, p1[index], p2[p3[index]]))
-        }
-
-    }
-}
-
-/**
- * @exports
- * @typedef {Object} TextureBaseMockParams
- * @property {string} name
- * @property {number} [height]
- * @property {number} [width]
- * @property {any} [signal]
- * @property {string} [type]
- */
-
-class TextureBaseMock {
-    /**
-     * @param {TextureBaseMockParams} params 
-     * @memberof SceneObjectBaseMock 
-     */
-    constructor(params) {
-        this._identifier = (params.type ?? 'texture') + ':' + Math.round(Math.random() * 10000);
-        this._name = params.name;
-        this._signal = params.signal ?? null;
-        this._height = new ScalarSignalMock$1(params.height ?? 0);  
-        this._width = new ScalarSignalMock$1(params.width ?? 0);  
-    }
-
-    get identifier() {
-        return this._identifier;
-    }
-
-    get name() {
-        return this._name;
-    }
-
-    get signal() {
-        return this._signal;
-    }
-
-    get height() {
-        return this._height;
-    }
-
-    get width() {
-        return this._width;
-    }
-}
-
-/**
- * @exports
- * @typedef {Object} MaterialBaseMockParams
- * @property {string} name
- * @property {number} [alphaCutoff]
- * @property {boolean} [alphaTestEnabled]
- * @property {boolean} [depthTestEnabled]
- * @property {boolean} [depthWriteEnabled]
- * @property {TextureBase} [diffuse]
- * @property {boolean} [doubleSided]
- * @property {number} [opacity]
- * @property {string} [type]
- */
-
-class MaterialBaseMock {
-    /**
-     * @param {MaterialBaseMockParams} params 
-     * @memberof SceneObjectBaseMock 
-     */
-    constructor(params) {
-        this._identifier = (params.type ?? 'material') + ':' + Math.round(Math.random() * 10000);
-        this._name = params.name;
-        this._alphaCutoff = new ScalarSignalMock$1(params.alphaCutoff ?? 0);
-        this._alphaTestEnabled = new BoolSignalMock$1(params.alphaTestEnabled ?? false);
-        this._depthTestEnabled = new BoolSignalMock$1(params.depthTestEnabled ?? false);
-        this._depthWriteEnabled = new BoolSignalMock$1(params.depthWriteEnabled ?? false);
-        this._diffuse = params.diffuse ?? null;
-        this._doubleSided = new BoolSignalMock$1(params.doubleSided ?? false);
-        this._opacity = new ScalarSignalMock$1(params.opacity ?? 0);
-    }
-
-    get identifier() {
-        return this._identifier;
-    }
-
-    get name() {
-        return this._name;
-    }
-
-    get alphaCutoff() {
-        return this._alphaCutoff;
-    }
-
-    set alphaCutoff(value) {
-        this._alphaCutoff.mockUpdate(value);
-    }
-
-    get alphaTestEnabled() {
-        return this._alphaTestEnabled;
-    }
-
-    set alphaTestEnabled(value) {
-        this._alphaTestEnabled.mockUpdate(value);
-    }
-
-    get depthTestEnabled() {
-        return this._alphaTestEnabled;
-    }
-
-    set depthTestEnabled(value) {
-        this._depthTestEnabled.mockUpdate(value);
-    }
-
-    get depthWriteEnabled() {
-        return this._depthWriteEnabled;
-    }
-
-    set depthWriteEnabled(value) {
-        this._depthWriteEnabled.mockUpdate(value);
-    }
-
-    get diffuse() {
-        return this._diffuse;
-    }
-   
-    get doubleSided() {
-        return this._doubleSided;
-    }
-
-    set doubleSided(value) {
-        this._doubleSided.mockUpdate(value);
-    }
-
-    get opacity() {
-        return this._opacity;
-    }
-
-    set opacity(value) {
-        this._opacity.mockUpdate(value);
-    }
-
-    async getDiffuse() {
-        return this._diffuse;
-    }
-}
-
-/** @type {MaterialBaseMock[]} */
-let MaterialStructure = [];
-
-class MaterialsMock {
-    /**
-     * @param {string} materialName 
-     */
-    static async findFirst(materialName) {
-        let result = MaterialStructure.filter(mat => mat.name == materialName)[0];
-        return result ?? null;
-    }
-
-    static async getAll() {
-        return MaterialStructure
-    }
-    
-    /**
-     * @param {string} namePattern 
-     * @param {{limit?: number}} config 
-     */
-    static async findUsingPattern(namePattern, config = {}) {
-        if (namePattern.charAt(0) === '*') namePattern = '.' + namePattern;
-
-        let result = MaterialStructure.filter(mat => mat.name.match(namePattern));
-
-        return result.slice(0, config.limit ?? result.length);
-    }
-
-    /**
-     * @param {import("./MaterialBase.mock").MaterialBaseMockParams[]} structure
-     * @memberof SceneMock
-     */
-    static mockReset(structure = []) {
-        MaterialStructure = structure.map(s => new MaterialBaseMock(s)) ?? [];
-    }
-
-}
-
-/** @type {Object<string, SignalMock|EventSourceMock>} */
-let  PatchesStructureInputs = {};
-
-class PatchesInputsMock {
-    /**
-     * @param {string} name 
-     * @param {SignalMock | boolean | number | string} signal 
-     */
-    static async set(name, signal) {
-        let value;
-        switch (typeof signal) {
-            case 'string':
-                value = new StringSignalMock(signal);
-                break;
-
-            case 'boolean':
-                value = new BoolSignalMock$1(signal);
-                break;
-
-            case 'number':
-                value = new ScalarSignalMock$1(signal);
-                break;
-
-            default:
-                value = signal;
-        }
-        PatchesStructureInputs[name] = value;
-    }
-
-    /** 
-     * @param {string} name 
-     * @param {BoolSignalMock | boolean} signal 
-     */
-    static async setBoolean(name, signal) {
-        let value;
-        switch (typeof signal) {
-            case 'boolean':
-                value = new BoolSignalMock$1(signal);
-                break;
-            default:
-                value = signal;
-        }
-        PatchesStructureInputs[name] = value;
-    }
-
-    /**
-     * @param {string} name 
-     * @param {SignalMock} signal 
-     */
-    static async setColor(name, signal) {
-        PatchesStructureInputs[name] = signal;
-    }
-
-    /** 
-     * @param {string} name 
-     * @param {ScalarSignalMock | number} signal 
-     */
-    static async setScalar(name, signal) {
-        let value;
-        switch (typeof signal) {
-            case 'number':
-                value = new ScalarSignalMock$1(signal);
-                break;
-
-            default:
-                value = signal;
-        }
-        PatchesStructureInputs[name] = value;
-    }
-
-    /** 
-     * @param {string} name 
-     * @param {StringSignalMock | string} signal 
-     */
-    static async setString(name, signal) {
-        let value;
-        switch (typeof signal) {
-            case 'string':
-                value = new StringSignalMock(signal);
-                break;
-
-            default:
-                value = signal;
-        }
-        PatchesStructureInputs[name] = value;
-    }
-
-    /** 
-     * @param {string} name 
-     * @param {VectorSignalMock} signal 
-     */
-    static async setPoint(name, signal) {
-        PatchesStructureInputs[name] = signal;
-    }
-
-    /** 
-     * @param {string} name 
-     * @param {Vec2SignalMock} signal 
-     */
-    static async setPoint2D(name, signal) {
-        PatchesStructureInputs[name] = signal;
-    }
-
-    /** 
-     * @param {string} name 
-     * @param {VectorSignalMock} signal 
-     */
-    static async setVector(name, signal) {
-        PatchesStructureInputs[name] = signal;
-    }
-
-    /** 
-     * @param {string} name 
-     * @param {EventSourceMock} signal 
-     */
-    static async setPulse(name, signal) {
-        PatchesStructureInputs[name] = signal;
-    }
-
-    static mockReset() {
-        PatchesStructureInputs = {};
-    }
-
-    static mockGetPatchesStructureInputs() {
-        return PatchesStructureInputs
-    }
-}
-
-/** @type {Object<string, SignalMock|EventSourceMock>} */
-let PatchesStructureOutputs = {};
-
-//Skipped getColor, getColorOrFallback methods
-class PatchesOuputsMock {
-    /**
-     * @param {string} name 
-     */
-   static async get(name) {
-        return PatchesStructureOutputs[name]
-   }
-
-    /**
-     * @param {string} name 
-     * @returns {Promise<BoolSignalMock>}
-     */
-    static async getBoolean(name) {
-        if (!(PatchesStructureOutputs[name] instanceof BoolSignalMock$1)) 
-            throw new TypeError(`Expected BoolSignalMock but got: ${typeof PatchesStructureOutputs[name]}`);
-        return /**@type {BoolSignalMock}*/ (PatchesStructureOutputs[name])
-   } 
-   
-    /**
-     * @param {string} name 
-     * @param {BoolSignalMock | boolean} fallback 
-     * @returns {Promise<BoolSignalMock>}
-     */
-    static async getBooleanOrFallback(name, fallback) {
-        let value;
-        if (!(PatchesStructureOutputs[name] instanceof BoolSignalMock$1)) {
-            if (typeof fallback == 'boolean') value = new BoolSignalMock$1(fallback);
-            else value = fallback; 
-        }
-        else 
-            value = PatchesStructureOutputs[name];
-        return /**@type {BoolSignalMock}*/ (value)
-   }
-   
-   /**
-    * @param {string} name 
-    * @param {SignalMock | boolean | number | string} fallback 
-    * @returns {Promise<SignalMock>}
-    */
-   static async getOrFallback(name, fallback) {
-    let value;
-    if (!(PatchesStructureOutputs[name] instanceof SignalMock)) {
-        switch (typeof fallback) {
-            case 'boolean':
-                value = new BoolSignalMock$1(fallback);
-                break;
-
-            case 'number':
-                value = new ScalarSignalMock$1(fallback);
-                break;
-            
-            case 'string':
-                value = new StringSignalMock(fallback);
-                break;
-
-            default:
-                value = fallback;
-        }
-    }
-    else 
-        value = PatchesStructureOutputs[name];
-    return /**@type {SignalMock}*/ (value)
-   }
-
-    /**
-    * @param {string} name 
-    * @returns {Promise<VectorSignalMock>}
-    */
-    static async getPoint(name) {
-        if (!(PatchesStructureOutputs[name] instanceof VectorSignalMock)) 
-            throw new TypeError(`Expected VectorSignalMock`);
-        return /**@type {VectorSignalMock}*/ (PatchesStructureOutputs[name])
-    }
-
-    /**
-    * @param {string} name 
-    * @param {VectorSignalMock} fallback 
-    * @returns {Promise<VectorSignalMock>}
-    */
-    static async getPointOrFallback(name, fallback) {
-        let value;
-        if (!(PatchesStructureOutputs[name] instanceof VectorSignalMock)) value = fallback;
-        else value = PatchesStructureOutputs[name];
-        return /**@type {VectorSignalMock}*/ (value)
-    }
-
-    /**
-    * @param {string} name 
-    * @returns {Promise<Vec2SignalMock>}
-    */
-    static async getPoint2D(name) {
-        if (!(PatchesStructureOutputs[name] instanceof Vec2SignalMock$1)) 
-            throw new TypeError(`Expected Vec2SignalMock`);
-        return /**@type {Vec2SignalMock}*/ (PatchesStructureOutputs[name])
-    }
-
-   /**
-    * @param {string} name 
-    * @param {Vec2SignalMock} fallback 
-    * @returns {Promise<Vec2SignalMock>}
-    */
-    static async getPoint2DOrFallback(name, fallback) {
-        let value;
-        if (!(PatchesStructureOutputs[name] instanceof Vec2SignalMock$1)) value = fallback;
-        else value = PatchesStructureOutputs[name];
-        return /**@type {Vec2SignalMock}*/ (value)
-    }
-
-    /**
-    * @param {string} name 
-    * @returns {Promise<EventSourceMock>}
-    */
-    static async getPulse(name) {
-        if (!(PatchesStructureOutputs[name] instanceof EventSourceMock)) 
-            throw new TypeError(`Expected EventSourceMock`);
-        return /**@type {EventSourceMock}*/ (PatchesStructureOutputs[name])
-    }
-
-   /**
-    * @param {string} name 
-    * @param {EventSourceMock} fallback 
-    * @returns {Promise<EventSourceMock>}
-    */
-    static async getPulseOrFallback(name, fallback) {
-        let value;
-        if (!(PatchesStructureOutputs[name] instanceof EventSourceMock)) value = fallback;    
-        else value = PatchesStructureOutputs[name];
-        return /**@type {EventSourceMock}*/ (value)
-    }
-
-    /**
-    * @param {string} name 
-    * @returns {Promise<ScalarSignalMock>}
-    */
-    static async getScalar(name) {
-        if (!(PatchesStructureOutputs[name] instanceof ScalarSignalMock$1)) 
-            throw new TypeError(`Expected ScalarSiganlMcok`);
-        return /**@type {ScalarSignalMock}*/ (PatchesStructureOutputs[name])
-    }
-    
-    /**
-     * @param {string} name 
-     * @param {ScalarSignalMock | number} fallback 
-     * @returns {Promise<ScalarSignalMock>}
-     */
-    static async getScalarOrFallback(name, fallback) {
-        let value;
-        if (!(PatchesStructureOutputs[name] instanceof ScalarSignalMock$1)) {
-            if (typeof fallback == 'number') value = new ScalarSignalMock$1(fallback);
-            else value = fallback; 
-        }
-        else 
-            value = PatchesStructureOutputs[name];
-        return /**@type {ScalarSignalMock}*/ (value)
-    }
-
-    /**
-    * @param {string} name 
-    * @returns {Promise<StringSignalMock>}
-    */
-    static async getString(name) {
-        if (!(PatchesStructureOutputs[name] instanceof StringSignalMock)) 
-            throw new TypeError(`Expected StringSignalMock`);
-        return /**@type {StringSignalMock}*/ (PatchesStructureOutputs[name])
-    }
-    
-    /**
-     * @param {string} name 
-     * @param {StringSignalMock | string} fallback 
-     * @returns {Promise<StringSignalMock>}
-     */
-    static async getStringOrFallback(name, fallback) {
-        let value;
-        if (!(PatchesStructureOutputs[name] instanceof StringSignalMock)) {
-            if (typeof fallback == 'string') value = new StringSignalMock(fallback);
-            else value = fallback; 
-        }
-        else 
-            value = PatchesStructureOutputs[name];
-        return /**@type {StringSignalMock}*/ (value)
-    }
-
-    /**
-    * @param {string} name 
-    * @returns {Promise<VectorSignalMock>}
-    */
-    static async getVector(name) {
-        if (!(PatchesStructureOutputs[name] instanceof VectorSignalMock)) 
-            throw new TypeError(`Expected VectorSignalMock`);
-        return /**@type {VectorSignalMock}*/ (PatchesStructureOutputs[name])
-    }
-    
-    /**
-     * @param {string} name 
-     * @param {VectorSignalMock} fallback 
-     * @returns {Promise<VectorSignalMock>}
-     */
-    static async getVectorOrFallback(name, fallback) {
-        let value;
-        if (!(PatchesStructureOutputs[name] instanceof VectorSignalMock)) value = fallback;
-        else value = PatchesStructureOutputs[name];
-        return /**@type {VectorSignalMock}*/ (value)
-    }
-
-    /**
-     * @param {Object<string, SignalMock|EventSourceMock>} value 
-     */
-    static mockReset(value = {}) {
-        PatchesStructureOutputs = value;
-    }
-}
-
-class PatchesMock {
-    static get inputs() {
-        return PatchesInputsMock
-    }
-
-    static get outputs() {
-        return PatchesOuputsMock
-    }
-}
-
-class StorageLocationMock {
-    
-    /**
-     * @param {Object<string,Object>} storageLocationData 
-     */
-    constructor(storageLocationData = {}) {
-        /**@type {Object<string,Object>} */
-        this._storageLocationData = storageLocationData;
-    }
-
-    /**
-     * @param {string} key 
-     * @returns {Promise<Object | null>}
-     */
-    async get(key) {
-        return this._storageLocationData[key] ?? null
-    }
-
-    /**
-     * @param {string} key 
-     */
-    async remove(key) {
-        this._storageLocationData[key] = undefined;
-    }
-
-    /**
-     * 
-     * @param {string} key 
-     * @param {Object} value 
-     */
-    async set(key, value) {
-        this._storageLocationData[key] = value;
-    }
-}
-
-let block = new StorageLocationMock();
-let local = new StorageLocationMock();
-
-class PersistenceMock {
-    
-    static get block() {
-        return block
-    }
-
-    static get local() {
-        return local
-    }
-
-    /**
-     * 
-     * @param {*} blockParam 
-     * @param {*} localParam 
-     */
-    static mockReset(blockParam = {}, localParam = {}) {
-        block = new StorageLocationMock(blockParam);
-        local = new StorageLocationMock(localParam);
-    }
-}
-
-class Mat4Mock extends SignalMock {
-    /**
-     * @param {Matrix} value
-     * @memberof Mat4
+     * @param {boolean} value
+     * @memberof ScalarSignalMock
      */
     constructor(value) {
         super(value);
     }
 
     /**
-     * @param {Mat4Mock} matrix
-     * @memberof Mat4Mock
+     * @param {{ fireOnInitialValue: boolean; }} [config]
      */
-    multiply(matrix) {
-        let mat4 = new Mat4Mock(this.value.multiply(matrix.value));
+    onOn(config) {
+        let eventSource = new EventSourceMock(config, this);
 
         this.monitor().subscribe(async () => {
-            await mat4.mockUpdate(this.value.multiply(matrix.value));
+            if (this.value === true)         
+                await eventSource.mockCallback();
         });
 
-        matrix.monitor().subscribe(async () => {
-            await mat4.mockUpdate(this.value.multiply(matrix.value));
-        });
-
-        return mat4;
+        return eventSource;
     }
 
     /**
-     * @param {VectorSignalMock} point
-     * @memberof Mat4Mock
+     * @param {{ fireOnInitialValue: boolean; }} [config]
      */
-    transformPoint(point) {
+    onOff(config) {
+        let eventSource = new EventSourceMock(config, this);
+
+        this.monitor().subscribe(async () => {
+            if (this.value === false)         
+                await eventSource.mockCallback();
+        });
+
+        return eventSource;
+    }
+
+    /** 
+     * @param {boolean | BoolSignalMock} signal 
+     * @memberof BoolSignalMock
+     * @returns BoolSignalMock
+     */
+    or(signal) {
         let callback = () => {
-            return this.value.transformPoint(point.value);
+            return (typeof signal === 'boolean') ? this.value || signal : this.value || signal.value
+        };
+        
+        let newSignal = new BoolSignalMock(callback());
+
+        monitor$2(this, signal, null, newSignal, callback);
+
+        return newSignal;
+    }
+
+    /** 
+     * @param {boolean | BoolSignalMock} signal 
+     * @memberof BoolSignalMock
+     * @returns BoolSignalMock
+     */
+    and(signal) {
+        let callback = () => {
+            return (typeof signal === 'boolean') ? this.value && signal : this.value && signal.value
+        };
+        
+        let newSignal = new BoolSignalMock(callback());
+
+        monitor$2(this, signal,null, newSignal, callback);
+
+        return newSignal;
+    }
+
+    /** 
+     * @param {boolean | BoolSignalMock} signal 
+     * @memberof BoolSignalMock
+     * @returns BoolSignalMock
+     */
+    eq(signal) {
+        let callback = () => {
+            return (typeof signal === 'boolean') ? this.value == signal : this.value == signal.value
+        };
+        
+        let newSignal = new BoolSignalMock(callback());
+
+        monitor$2(this, signal, null, newSignal, callback);
+
+        return newSignal;
+    }
+
+    /** 
+     * @param {boolean | BoolSignalMock} signal 
+     * @memberof BoolSignalMock
+     * @returns BoolSignalMock
+     */
+    ne(signal) {
+        let callback = () => {
+            return (typeof signal === 'boolean') ? this.value != signal : this.value != signal.value
+        };
+        
+        let newSignal = new BoolSignalMock(callback());
+
+        monitor$2(this, signal, null, newSignal, callback);
+
+        return newSignal;
+    }
+
+    /** 
+     * @memberof BoolSignalMock
+     * @returns BoolSignalMock
+     */
+    not() {
+        let callback = () => {
+            // @ts-ignore
+            return  !this.value
+        };
+        
+        let newSignal = new BoolSignalMock(callback());
+
+        monitor$2(this, null, null, newSignal, callback);
+
+        return newSignal;
+    }
+
+    /** 
+     * @param {boolean | BoolSignalMock} signal 
+     * @memberof BoolSignalMock
+     * @returns BoolSignalMock
+     */
+    xor(signal) {
+        let callback = () => {
+            return (typeof signal === 'boolean') ? (this.value || signal) && !(this.value && signal) : (this.value || signal.value) && !(this.value && signal.value)
+        };
+        
+        let newSignal = new BoolSignalMock(callback());
+
+        monitor$2(this, signal, null, newSignal, callback);
+
+        return newSignal;
+    }
+
+    /**
+     * @param {boolean | BoolSignalMock | string | StringSignalMock | number | ScalarSignalMock} thenSignal 
+     * @param {boolean | BoolSignalMock | string | StringSignalMock | number | ScalarSignalMock} elseSignal
+     * @memberof BoolSignalMock
+     * @returns BoolSignalMock  
+     */
+    ifThenElse(thenSignal, elseSignal) {
+        /**@type {boolean | string | number}*/
+        let thenSignalValue,
+        /**@type {boolean | string | number}*/
+        elseSignalValue;
+
+        let callback = () => {
+            switch (typeof thenSignal) {
+                case 'boolean':     
+                case 'string':
+                case 'number':
+                    thenSignalValue = thenSignal;
+                    break;
+    
+                default:
+                    thenSignalValue = thenSignal.value; 
+                    break;
+    
+            }
+    
+            switch (typeof elseSignal) {
+                case 'boolean': 
+                case 'string':
+                case 'number':
+                    elseSignalValue = elseSignal;
+                    break;
+    
+                default:
+                    elseSignalValue = elseSignal.value; 
+                    break;
+            }
+            return this.value ? thenSignalValue : elseSignalValue
         };
 
-        let pointSignal = new VectorSignalMock(callback());
+        let newSignal;
 
-        this.monitor().subscribe(async () => {
-            await pointSignal.mockUpdate(callback());
-        });
+        switch (typeof callback()) {
+            case 'string':
+                newSignal = new StringSignalMock$1(/** @type {string} */ (callback()));
+                break;
 
-        point.monitor().subscribe(async () => {
-            await pointSignal.mockUpdate(callback());
-        });
+            case 'number':
+                newSignal = new ScalarSignalMock$1(/** @type {number} */ (callback()));
+                break;
+            
+            case 'boolean':
+                newSignal = new BoolSignalMock(/** @type {boolean} */ (callback()));
+                break;
+        }
 
-        return pointSignal;
+        monitor$2(this, thenSignal, elseSignal, newSignal, callback);
+
+        return newSignal;
     }
 
     /**
-     * @param {VectorSignalMock} vector
-     * @memberof Mat4Mock
+     * @returns BoolSignalMock
      */
-    transformVector(vector) {
-        let callback = () => {
-            return this.value.transformVector(vector.value);
-        };
-
-        let vectorSignal = new VectorSignalMock(callback());
-
-        this.monitor().subscribe(async () => {
-            await vectorSignal.mockUpdate(callback());
-        });
-
-        vector.monitor().subscribe(async () => {
-            await vectorSignal.mockUpdate(callback());
-        });
-
-        return vectorSignal;
-    }
-
-    inverse() {
-        let mat4 = new Mat4Mock(this.value.inverse());
-
-        this.monitor().subscribe(async () => {
-            await mat4.mockUpdate(this.value.inverse());
-        });
-
-        return mat4;
-    }
-
-
-    /**
-     * @param {VectorSignalMock} target
-     * @param {VectorSignalMock} [up=new VectorSignalMock(new Vector3(0, 1, 0))]
-     * @return {Mat4Mock} 
-     * @memberof Mat4Mock
-     */
-    lookAt(target, up = new VectorSignalMock(new mathModule.Vector3(0, 1, 0))) {
-        let callback = () => {
-            return this.value.lookAt(target.value, up.value);
-        };
-
-        let mat4 = new Mat4Mock(callback());
-
-        this.monitor().subscribe(async () => {
-            await mat4.mockUpdate(callback());
-        });
-
-        target.monitor().subscribe(async () => {
-            await mat4.mockUpdate(callback());
-        });
-
-        up.monitor().subscribe(async () => {
-            await mat4.mockUpdate(callback());
-        });
-
-        return mat4;
-    }
-
-
-    transpose() {
-        let mat4 = new Mat4Mock(this.value.transpose());
-
-        this.monitor().subscribe(async () => {
-            await mat4.mockUpdate(this.value.transpose());
-        });
-
-        return mat4;
+    pin() {
+        return new BoolSignalMock(this._value);
     }
 
     /**
-     * @static
-     * @param {VectorSignalMock} position
-     * @param {QuaternionSignalMock} quaternion
-     * @param {VectorSignalMock} scale
-     * @return {Mat4Mock} 
-     * @memberof Matrix
+     * @returns boolean
      */
-    static compose(position, quaternion, scale) {
-        function callback() { return mathModule.Matrix.compose(position.value, quaternion.value, scale.value) }
-        async function update() { await mat4.mockUpdate(callback()); }
-
-        let mat4 = new Mat4Mock(callback());
-
-        position.monitor().subscribe(update);
-        quaternion.monitor().subscribe(update);
-        scale.monitor().subscribe(update);
-
-        return mat4;
+    pinLastValue() {
+        return this._value;
     }
 }
+
+/**
+ * @param {SignalMock} outputSignal
+ * @param {SignalMock | boolean | string | number | null} inputFirstSignal
+ * @param {SignalMock | boolean | string | number | null} inputSecondSignal
+ * @param {SignalMock} newOwnsignal
+ * @param {Function} callback
+ */
+function monitor$2(outputSignal, inputFirstSignal, inputSecondSignal, newOwnsignal, callback) {
+    outputSignal.monitor().subscribe(async () => {
+        await newOwnsignal.mockUpdate(callback());
+    });
+
+    if (typeof inputFirstSignal !== 'string' && typeof inputFirstSignal !== 'number' && typeof inputFirstSignal !== 'boolean' && inputFirstSignal !== null && inputFirstSignal !== undefined) {
+        inputFirstSignal.monitor().subscribe(async () => {
+            await newOwnsignal.mockUpdate(callback());
+        });
+    }
+
+    if (typeof inputSecondSignal !== 'string' && typeof inputSecondSignal !== 'number' && typeof inputSecondSignal !== 'boolean' && inputSecondSignal !== null && inputSecondSignal !== undefined) {
+        inputSecondSignal.monitor().subscribe(async () => {
+            await newOwnsignal.mockUpdate(callback());
+        });
+    }
+}
+
+var BoolSignalMock$1 = BoolSignalMock;
+
+class StringSignalMock extends SignalMock {
+    /**
+     * @param {string} value
+     * @memberof ScalarSignalMock
+     */
+    constructor(value) {
+        super(value);
+    }
+
+    /**
+     * @param {string | StringSignalMock} signal 
+     * @memberof StringSignalMock
+     * @returns StringSignalMock
+     */
+    concat(signal) {
+        let callback = () => {
+            return (typeof signal === 'string') ? this.value.concat(signal) : this.value.concat(signal.value)
+        };
+        
+        let newSignal = new StringSignalMock(callback());
+
+        monitor$1(this, signal, null, newSignal, callback);
+
+        return newSignal;
+    }
+    
+    /**
+     * @param {string | StringSignalMock} signal
+     * @memberof StringSignalMock
+     * @returns BoolSignal
+     */
+    contains(signal) {
+        let callback = () => {
+            return (typeof signal === 'string') ? this.value.includes(signal) : this.value.includes(signal.value)
+        };
+        
+        let newSignal = new BoolSignalMock$1(callback());
+
+        monitor$1(this, signal, null, newSignal, callback);
+
+        return newSignal;
+    }
+
+    /**
+     * @param {string | StringSignalMock} signal
+     * @memberof StringSignalMock
+     * @returns BoolSignal
+     */
+    eq(signal) {
+        let callback = () => {
+            return (typeof signal === 'string') ? this.value == signal : this.value == signal.value 
+        };
+        
+        let newSignal = new BoolSignalMock$1(callback());
+
+        monitor$1(this, signal, null, newSignal, callback);
+
+        return newSignal;
+    }
+
+    /**
+     * @param {string | StringSignalMock} signal
+     * @memberof StringSignalMock
+     * @returns BoolSignal
+     */
+    ne(signal) {
+        let callback = () => {
+            return (typeof signal === 'string') ? this.value != signal : this.value != signal.value 
+        };
+        
+        let newSignal = new BoolSignalMock$1(callback());
+
+        monitor$1(this, signal, null, newSignal, callback);
+
+        return newSignal;
+    }
+
+    pin() {
+        return new StringSignalMock(this._value);
+    }
+
+    pinLastValue() {
+        return this._value;
+    }
+}
+
+/**
+ * @param {SignalMock} outputSignal
+ * @param {SignalMock | boolean | string | number | null} inputFirstSignal
+ * @param {SignalMock | boolean | string | number | null} inputSecondSignal
+ * @param {SignalMock} newOwnsignal
+ * @param {Function} callback
+ */
+function monitor$1(outputSignal, inputFirstSignal, inputSecondSignal, newOwnsignal, callback) {
+    outputSignal.monitor().subscribe(async () => {
+        await newOwnsignal.mockUpdate(callback());
+    });
+
+    if (typeof inputFirstSignal !== 'string' && typeof inputFirstSignal !== 'number' && typeof inputFirstSignal !== 'boolean' && inputFirstSignal !== null && inputFirstSignal !== undefined) {
+        inputFirstSignal.monitor().subscribe(async () => {
+            await newOwnsignal.mockUpdate(callback());
+        });
+    }
+
+    if (typeof inputSecondSignal !== 'string' && typeof inputSecondSignal !== 'number' && typeof inputSecondSignal !== 'boolean' && inputSecondSignal !== null && inputSecondSignal !== undefined) {
+        inputSecondSignal.monitor().subscribe(async () => {
+            await newOwnsignal.mockUpdate(callback());
+        });
+    }
+}
+
+var StringSignalMock$1 = StringSignalMock;
 
 class ScalarSignalSourceMock {
     constructor(name) {
@@ -6147,7 +4427,7 @@ class ScalarSignalSourceMock {
 class StringSignalSourceMock {
     constructor(name) {
         this._name = name;
-        this._signal = new StringSignalMock('');
+        this._signal = new StringSignalMock$1('');
     }
 
     get signal() {
@@ -6178,231 +4458,6 @@ class BoolSignalSourceMock {
     set(value) {
         this._signal.mockUpdate(value);
     }
-}
-
-class TransformSignalMock extends SignalMock {
-    /**
-     * @param {{ position: Vector3, rotation: Quaternion, scale: Vector3 }} value
-     * @memberof TransformSignalMock
-     */
-    constructor(value) {
-        super(value);
-
-        this._position = new VectorSignalMock(this.value.position);
-        this._rotation = new QuaternionSignalMock(this.value.rotation);
-        this._scale = new VectorSignalMock(this.value.scale);
-
-        this.monitor().subscribe(async () => {
-            await this._position.mockUpdate(this.value.position);
-            await this._rotation.mockUpdate(this.value.rotation);
-            await this._scale.mockUpdate(this.value.scale);
-        });
-    }
-
-    get position() { return this._position }
-
-    set position(position) {
-        this._position.mockUpdate(position);
-    }
-
-    get rotation() { return this._rotation }
-
-    set rotation(rotation) {
-        this._rotation.mockUpdate(rotation);
-    }
-
-    get scale() { return this._scale }
-
-    set scale(scale) {
-        this._scale.mockUpdate(scale);
-    }
-
-    get x() { return this.position.x }
-    set x(value) { this.position.mockUpdateX(value); }
-
-    get y() { return this.position.y }
-    set y(value) { this.position.mockUpdateY(value); }
-
-    get z() { return this.position.z }
-    set z(value) { this.position.mockUpdateZ(value); }
-
-    // get rotationX() { return this.rotation.eulerAngles.x }
-    // get rotationY() { return this.rotation.eulerAngles.y }
-    // get rotationZ() { return this.rotation.eulerAngles.z }
-
-    get scaleX() { return this.scale.x }
-    set scaleX(value) { this.scale.mockUpdateX(value); }
-
-    get scaleY() { return this.scale.y }
-    set scaleY(value) { this.scale.mockUpdateY(value); }
-
-    get scaleZ() { return this.scale.z }
-    set scaleZ(value) { this.scale.mockUpdateZ(value); }
-
-    get forward() {
-        // @ts-ignore
-        return rotateVector(Reactive.vector(0, 0, -1), this.rotation);
-    }
-
-    get right() {
-        // @ts-ignore
-        return rotateVector(Reactive.vector(1, 0, 0), this.rotation);
-    }
-
-    get up() {
-        // @ts-ignore
-        return rotateVector(Reactive.vector(0, 1, 0), this.rotation);
-    }
-
-    /**
-     * @param {TransformSignalMock} transform
-     * @return {TransformSignalMock} 
-     * @memberof TransformSignalMock
-     */
-    applyTo(transform) {
-        return TransformSignalMock.fromMatrix(this.toMatrix().multiply(transform.toMatrix()));
-    }
-
-    /**
-     * @param {VectorSignalMock} point
-     * @return {VectorSignalMock} 
-     * @memberof TransformSignalMock
-     */
-    applyToPoint(point) {
-        return this.toMatrix().transformPoint(point);
-    }
-
-    /**
-     * @param {VectorSignalMock} vector
-     * @return {VectorSignalMock} 
-     * @memberof TransformSignalMock
-     */
-    applyToVector(vector) {
-        return this.toMatrix().transformVector(vector);
-    }
-
-    inverse() {
-        return TransformSignalMock.fromMatrix(this.toMatrix().inverse());
-    }
-
-    /**
-     *
-     *
-     * @param {VectorSignalMock} target
-     * @param {VectorSignalMock} [up=new VectorSignalMock(new Vector3(0, 1, 0))]
-     * @return {TransformSignalMock} 
-     * @memberof TransformSignalMock
-     */
-    lookAt(target, up = new VectorSignalMock(new mathModule.Vector3(0, 1, 0))) {
-        return TransformSignalMock.fromMatrix(this.toMatrix().lookAt(target, up));
-    }
-
-    transpose() {
-        return TransformSignalMock.fromMatrix(this.toMatrix().transpose());
-    }
-
-    toMatrix() {
-        return Mat4Mock.compose(
-            this.position,
-            this.rotation,
-            this.scale
-        );
-    }
-
-    /**
-     * @static
-     * @param {Mat4} matrix
-     * @return {TransformSignalMock} 
-     * @memberof TransformSignalMock
-     */
-    static fromMatrix(matrix) {
-        function callback() {
-            const te = matrix.value.elements;
-
-            // Extract the position, rotation, and scale from the given matrix
-            const position = new mathModule.Vector3(te[12], te[13], te[14]);
-
-            const scale = new mathModule.Vector3(
-                Math.sqrt(te[0] * te[0] + te[1] * te[1] + te[2] * te[2]),
-                Math.sqrt(te[4] * te[4] + te[5] * te[5] + te[6] * te[6]),
-                Math.sqrt(te[8] * te[8] + te[9] * te[9] + te[10] * te[10])
-            );
-
-            let w = 0,
-                x = 0,
-                y = 0,
-                z = 0;
-
-            const invSX = 1 / scale.x;
-            const invSY = 1 / scale.y;
-            const invSZ = 1 / scale.z;
-
-            const m11 = te[0] * invSX, m12 = te[4] * invSY, m13 = te[8] * invSZ;
-            const m21 = te[1] * invSX, m22 = te[5] * invSY, m23 = te[9] * invSZ;
-            const m31 = te[2] * invSX, m32 = te[6] * invSY, m33 = te[10] * invSZ;
-
-            const trace = m11 + m22 + m33;
-
-            if (trace > 0) {
-                const s = 0.5 / Math.sqrt(trace + 1.0);
-
-                w = 0.25 / s;
-                x = (m32 - m23) * s;
-                y = (m13 - m31) * s;
-                z = (m21 - m12) * s;
-
-            } else if (m11 > m22 && m11 > m33) {
-                const s = 2.0 * Math.sqrt(1.0 + m11 - m22 - m33);
-
-                w = (m32 - m23) / s;
-                x = 0.25 * s;
-                y = (m12 + m21) / s;
-                z = (m13 + m31) / s;
-
-            } else if (m22 > m33) {
-                const s = 2.0 * Math.sqrt(1.0 + m22 - m11 - m33);
-
-                w = (m13 - m31) / s;
-                x = (m12 + m21) / s;
-                y = 0.25 * s;
-                z = (m23 + m32) / s;
-
-            } else {
-                const s = 2.0 * Math.sqrt(1.0 + m33 - m11 - m22);
-
-                w = (m21 - m12) / s;
-                x = (m13 + m31) / s;
-                y = (m23 + m32) / s;
-                z = 0.25 * s;
-            }
-
-            const rotation = new Quaternion(w, x, y, z);
-
-            return { position: position, rotation: rotation, scale: scale };
-        }
-
-        matrix.monitor().subscribe(async () => {
-            await transformSignal.mockUpdate(callback());
-        });
-
-        let transformSignal = new TransformSignalMock(callback());
-
-        return transformSignal;
-    }
-
-    toSignal() {
-        return this;
-    }
-}
-
-/**
- * @param {VectorSignalMock} vector
- * @param {QuaternionSignalMock} rotation
- * @return {*} 
- */
-function rotateVector(vector, rotation) {
-    let point_q = Reactive.quaternion(0, vector.x, vector.y, vector.z);
-    return rotation.mul(point_q).mul(rotation.conjugate());
 }
 
 class ReactiveMock {
@@ -6439,7 +4494,7 @@ class ReactiveMock {
      */
     static val(signal) {
         switch (typeof signal) {
-            case 'string': return new StringSignalMock(signal);
+            case 'string': return new StringSignalMock$1(signal);
             case 'number': return new ScalarSignalMock$1(signal);
             case 'boolean': return new BoolSignalMock$1(signal);
         }
@@ -7516,8 +5571,8 @@ class ReactiveMock {
             if (val1 instanceof ScalarSignalMock$1) return val0.eq(val1);
             else throw new Error('Exception in HostFunction: Component is not defined for the provided input types')
         }
-        if (val0 instanceof StringSignalMock) {
-            if (val1 instanceof StringSignalMock) return val0.eq(val1);
+        if (val0 instanceof StringSignalMock$1) {
+            if (val1 instanceof StringSignalMock$1) return val0.eq(val1);
             else throw new Error('Exception in HostFunction: Component is not defined for the provided input types')
         }
         if (val0 instanceof BoolSignalMock$1) {
@@ -7535,8 +5590,8 @@ class ReactiveMock {
             if (val1 instanceof ScalarSignalMock$1) return val0.ne(val1);
             else throw new Error('Exception in HostFunction: Component is not defined for the provided input types')
         }
-        if (val0 instanceof StringSignalMock) {
-            if (val1 instanceof StringSignalMock) return val0.ne(val1);
+        if (val0 instanceof StringSignalMock$1) {
+            if (val1 instanceof StringSignalMock$1) return val0.ne(val1);
             else throw new Error('Exception in HostFunction: Component is not defined for the provided input types')
         }
         if (val0 instanceof BoolSignalMock$1) {
@@ -7595,11 +5650,11 @@ class ReactiveMock {
      */
     static ifThenElse(bool0, bool1, elseSignal) {
         if(bool0 instanceof BoolSignalMock$1 && (
-            bool1 instanceof ScalarSignalMock$1 || bool1 instanceof StringSignalMock || bool1 instanceof BoolSignalMock$1
+            bool1 instanceof ScalarSignalMock$1 || bool1 instanceof StringSignalMock$1 || bool1 instanceof BoolSignalMock$1
         )) return bool0.ifThenElse(bool1, elseSignal)
         else {
             if(bool1 instanceof BoolSignalMock$1 && (
-                bool0 instanceof ScalarSignalMock$1 || bool0 instanceof StringSignalMock || bool0 instanceof BoolSignalMock$1
+                bool0 instanceof ScalarSignalMock$1 || bool0 instanceof StringSignalMock$1 || bool0 instanceof BoolSignalMock$1
             )) return bool1.ifThenElse(bool0, elseSignal)
             else throw new Error('Exception in HostFunction: Component is not defined for the provided input types');
         }
@@ -7813,7 +5868,7 @@ class ReactiveMock {
             else return defaultVal;
         };
 
-        let newSignal = new StringSignalMock(callback());
+        let newSignal = new StringSignalMock$1(callback());
 
         cond.monitor().subscribe(() => {
             newSignal.mockUpdate(callback());
@@ -7836,7 +5891,7 @@ class ReactiveMock {
             }
         };
 
-        let newSignal = new TransformSignalMock(callback());
+        let newSignal = new TransformSignalMock$1(callback());
 
         monitorForThreeArg(translation, scale, rotation, newSignal, callback);
 
@@ -7856,7 +5911,7 @@ function monitor(firstSignal, secondSignal, signal, callback) {
     });
 
     if (secondSignal instanceof ScalarSignalMock$1 ||
-        secondSignal instanceof StringSignalMock ||
+        secondSignal instanceof StringSignalMock$1 ||
         secondSignal instanceof BoolSignalMock$1 ||
         secondSignal instanceof Vec2SignalMock$1 ||
         secondSignal instanceof VectorSignalMock ||
@@ -7905,7 +5960,1474 @@ function monitorForThreeArg(firstSignal, secondSignal, thirdSignal, signal, call
     }
 }
 
-var Reactive = ReactiveMock;
+class Mat4Mock extends SignalMock {
+    /**
+     * @param {Matrix} value
+     * @memberof Mat4
+     */
+    constructor(value) {
+        super(value);
+    }
+
+    /**
+     * @param {Mat4Mock} matrix
+     * @memberof Mat4Mock
+     */
+    multiply(matrix) {
+        let mat4 = new Mat4Mock(this.value.multiply(matrix.value));
+
+        this.monitor().subscribe(async () => {
+            await mat4.mockUpdate(this.value.multiply(matrix.value));
+        });
+
+        matrix.monitor().subscribe(async () => {
+            await mat4.mockUpdate(this.value.multiply(matrix.value));
+        });
+
+        return mat4;
+    }
+
+    /**
+     * @param {VectorSignalMock} point
+     * @memberof Mat4Mock
+     */
+    transformPoint(point) {
+        let callback = () => {
+            return this.value.transformPoint(point.value);
+        };
+
+        let pointSignal = new VectorSignalMock(callback());
+
+        this.monitor().subscribe(async () => {
+            await pointSignal.mockUpdate(callback());
+        });
+
+        point.monitor().subscribe(async () => {
+            await pointSignal.mockUpdate(callback());
+        });
+
+        return pointSignal;
+    }
+
+    /**
+     * @param {VectorSignalMock} vector
+     * @memberof Mat4Mock
+     */
+    transformVector(vector) {
+        let callback = () => {
+            return this.value.transformVector(vector.value);
+        };
+
+        let vectorSignal = new VectorSignalMock(callback());
+
+        this.monitor().subscribe(async () => {
+            await vectorSignal.mockUpdate(callback());
+        });
+
+        vector.monitor().subscribe(async () => {
+            await vectorSignal.mockUpdate(callback());
+        });
+
+        return vectorSignal;
+    }
+
+    inverse() {
+        let mat4 = new Mat4Mock(this.value.inverse());
+
+        this.monitor().subscribe(async () => {
+            await mat4.mockUpdate(this.value.inverse());
+        });
+
+        return mat4;
+    }
+
+
+    /**
+     * @param {VectorSignalMock} target
+     * @param {VectorSignalMock} [up=new VectorSignalMock(new Vector3(0, 1, 0))]
+     * @return {Mat4Mock} 
+     * @memberof Mat4Mock
+     */
+    lookAt(target, up = new VectorSignalMock(new mathModule.Vector3(0, 1, 0))) {
+        let callback = () => {
+            return this.value.lookAt(target.value, up.value);
+        };
+
+        let mat4 = new Mat4Mock(callback());
+
+        this.monitor().subscribe(async () => {
+            await mat4.mockUpdate(callback());
+        });
+
+        target.monitor().subscribe(async () => {
+            await mat4.mockUpdate(callback());
+        });
+
+        up.monitor().subscribe(async () => {
+            await mat4.mockUpdate(callback());
+        });
+
+        return mat4;
+    }
+
+
+    transpose() {
+        let mat4 = new Mat4Mock(this.value.transpose());
+
+        this.monitor().subscribe(async () => {
+            await mat4.mockUpdate(this.value.transpose());
+        });
+
+        return mat4;
+    }
+
+    /**
+     * @static
+     * @param {VectorSignalMock} position
+     * @param {QuaternionSignalMock} quaternion
+     * @param {VectorSignalMock} scale
+     * @return {Mat4Mock} 
+     * @memberof Matrix
+     */
+    static compose(position, quaternion, scale) {
+        function callback() { return mathModule.Matrix.compose(position.value, quaternion.value, scale.value) }
+        async function update() { await mat4.mockUpdate(callback()); }
+
+        let mat4 = new Mat4Mock(callback());
+
+        position.monitor().subscribe(update);
+        quaternion.monitor().subscribe(update);
+        scale.monitor().subscribe(update);
+
+        return mat4;
+    }
+}
+
+class TransformSignalMock extends SignalMock {
+    /**
+     * @param {{ position: Vector3, rotation: Quaternion, scale: Vector3 }} value
+     * @memberof TransformSignalMock
+     */
+    constructor(value) {
+        super(value);
+
+        this._position = new VectorSignalMock(this.value.position);
+        this._rotation = new QuaternionSignalMock(this.value.rotation);
+        this._scale = new VectorSignalMock(this.value.scale);
+
+        this.monitor().subscribe(async () => {
+            await this._position.mockUpdate(this.value.position);
+            await this._rotation.mockUpdate(this.value.rotation);
+            await this._scale.mockUpdate(this.value.scale);
+        });
+    }
+
+    get position() { return this._position }
+
+    set position(position) {
+        this._position.mockUpdate(position);
+    }
+
+    get rotation() { return this._rotation }
+
+    set rotation(rotation) {
+        this._rotation.mockUpdate(rotation);
+    }
+
+    get scale() { return this._scale }
+
+    set scale(scale) {
+        this._scale.mockUpdate(scale);
+    }
+
+    get x() { return this.position.x }
+    set x(value) { this.position.mockUpdateX(value); }
+
+    get y() { return this.position.y }
+    set y(value) { this.position.mockUpdateY(value); }
+
+    get z() { return this.position.z }
+    set z(value) { this.position.mockUpdateZ(value); }
+
+    // get rotationX() { return this.rotation.eulerAngles.x }
+    // get rotationY() { return this.rotation.eulerAngles.y }
+    // get rotationZ() { return this.rotation.eulerAngles.z }
+
+    get scaleX() { return this.scale.x }
+    set scaleX(value) { this.scale.mockUpdateX(value); }
+
+    get scaleY() { return this.scale.y }
+    set scaleY(value) { this.scale.mockUpdateY(value); }
+
+    get scaleZ() { return this.scale.z }
+    set scaleZ(value) { this.scale.mockUpdateZ(value); }
+
+    get forward() {
+        // @ts-ignore
+        return rotateVector(ReactiveMock.vector(0, 0, -1), this.rotation);
+    }
+
+    get right() {
+        // @ts-ignore
+        return rotateVector(ReactiveMock.vector(1, 0, 0), this.rotation);
+    }
+
+    get up() {
+        // @ts-ignore
+        return rotateVector(ReactiveMock.vector(0, 1, 0), this.rotation);
+    }
+
+    /**
+     * @param {TransformSignalMock} transform
+     * @return {TransformSignalMock} 
+     * @memberof TransformSignalMock
+     */
+    applyTo(transform) {
+        return TransformSignalMock.fromMatrix(this.toMatrix().multiply(transform.toMatrix()));
+    }
+
+    /**
+     * @param {VectorSignalMock} point
+     * @return {VectorSignalMock} 
+     * @memberof TransformSignalMock
+     */
+    applyToPoint(point) {
+        return this.toMatrix().transformPoint(point);
+    }
+
+    /**
+     * @param {VectorSignalMock} vector
+     * @return {VectorSignalMock} 
+     * @memberof TransformSignalMock
+     */
+    applyToVector(vector) {
+        return this.toMatrix().transformVector(vector);
+    }
+
+    inverse() {
+        return TransformSignalMock.fromMatrix(this.toMatrix().inverse());
+    }
+
+    /**
+     *
+     *
+     * @param {VectorSignalMock} target
+     * @param {VectorSignalMock} [up=new VectorSignalMock(new Vector3(0, 1, 0))]
+     * @return {TransformSignalMock} 
+     * @memberof TransformSignalMock
+     */
+    lookAt(target, up = new VectorSignalMock(new mathModule.Vector3(0, 1, 0))) {
+        return TransformSignalMock.fromMatrix(this.toMatrix().lookAt(target, up));
+    }
+
+    transpose() {
+        return TransformSignalMock.fromMatrix(this.toMatrix().transpose());
+    }
+
+    toMatrix() {
+        return Mat4Mock.compose(
+            this.position,
+            this.rotation,
+            this.scale
+        );
+    }
+
+    /**
+     * @static
+     * @param {Mat4} matrix
+     * @return {TransformSignalMock} 
+     * @memberof TransformSignalMock
+     */
+    static fromMatrix(matrix) {
+        function callback() {
+            const te = matrix.value.elements;
+
+            // Extract the position, rotation, and scale from the given matrix
+            const position = new mathModule.Vector3(te[12], te[13], te[14]);
+
+            const scale = new mathModule.Vector3(
+                Math.sqrt(te[0] * te[0] + te[1] * te[1] + te[2] * te[2]),
+                Math.sqrt(te[4] * te[4] + te[5] * te[5] + te[6] * te[6]),
+                Math.sqrt(te[8] * te[8] + te[9] * te[9] + te[10] * te[10])
+            );
+
+            let w = 0,
+                x = 0,
+                y = 0,
+                z = 0;
+
+            const invSX = 1 / scale.x;
+            const invSY = 1 / scale.y;
+            const invSZ = 1 / scale.z;
+
+            const m11 = te[0] * invSX, m12 = te[4] * invSY, m13 = te[8] * invSZ;
+            const m21 = te[1] * invSX, m22 = te[5] * invSY, m23 = te[9] * invSZ;
+            const m31 = te[2] * invSX, m32 = te[6] * invSY, m33 = te[10] * invSZ;
+
+            const trace = m11 + m22 + m33;
+
+            if (trace > 0) {
+                const s = 0.5 / Math.sqrt(trace + 1.0);
+
+                w = 0.25 / s;
+                x = (m32 - m23) * s;
+                y = (m13 - m31) * s;
+                z = (m21 - m12) * s;
+
+            } else if (m11 > m22 && m11 > m33) {
+                const s = 2.0 * Math.sqrt(1.0 + m11 - m22 - m33);
+
+                w = (m32 - m23) / s;
+                x = 0.25 * s;
+                y = (m12 + m21) / s;
+                z = (m13 + m31) / s;
+
+            } else if (m22 > m33) {
+                const s = 2.0 * Math.sqrt(1.0 + m22 - m11 - m33);
+
+                w = (m13 - m31) / s;
+                x = (m12 + m21) / s;
+                y = 0.25 * s;
+                z = (m23 + m32) / s;
+
+            } else {
+                const s = 2.0 * Math.sqrt(1.0 + m33 - m11 - m22);
+
+                w = (m21 - m12) / s;
+                x = (m13 + m31) / s;
+                y = (m23 + m32) / s;
+                z = 0.25 * s;
+            }
+
+            const rotation = new Quaternion(w, x, y, z);
+
+            return { position: position, rotation: rotation, scale: scale };
+        }
+
+        matrix.monitor().subscribe(async () => {
+            await transformSignal.mockUpdate(callback());
+        });
+
+        let transformSignal = new TransformSignalMock(callback());
+
+        return transformSignal;
+    }
+
+    toSignal() {
+        return this;
+    }
+}
+
+/**
+ * @param {VectorSignalMock} vector
+ * @param {QuaternionSignalMock} rotation
+ * @return {*} 
+ */
+function rotateVector(vector, rotation) {
+    let point_q = ReactiveMock.quaternion(0, vector.x, vector.y, vector.z);
+    return rotation.mul(point_q).mul(rotation.conjugate());
+}
+
+var TransformSignalMock$1 = TransformSignalMock;
+
+let cameraInfoModuleStructure = {
+    'captureDevicePosition': new StringSignalMock$1('x: 0, y: 0, z: 0'),
+    'isCapturingPhoto': new BoolSignalMock$1(false),
+    'isRecordingVideo': new BoolSignalMock$1(false),
+    'previewScreenScale': new ScalarSignalMock$1(0),
+    'previewSize': new Vec2SignalMock$1(new mathModule.Vector2(0, 0)),
+    'viewMatrix': new TransformSignalMock$1({
+        position: new mathModule.Vector3(0, 0, 0),
+        rotation: new Quaternion(0, 0, 0, 0),
+        scale: new mathModule.Vector3(0, 0, 0)
+    })
+};
+
+class CameraInfoModuleMock {
+
+    static get captureDevicePosition() {
+        return cameraInfoModuleStructure['captureDevicePosition']
+    }
+
+    static get isCapturingPhoto() {
+        return cameraInfoModuleStructure['isCapturingPhoto']
+    }
+
+    static get isRecordingVideo() {
+        return cameraInfoModuleStructure['isRecordingVideo']
+    }
+
+    static get previewScreenScale() {
+        return cameraInfoModuleStructure['previewScreenScale']
+    }
+
+    static get previewSize() {
+        return cameraInfoModuleStructure['previewSize']
+    }
+
+    static get viewMatrix() {
+        return cameraInfoModuleStructure['viewMatrix']
+    }
+
+    /**
+     * @param {{
+     * captureDevicePosition: StringSignalMock | string; 
+     * isCapturingPhoto: BoolSignalMock | boolean;
+     * isRecordingVideo: BoolSignalMock | boolean;
+     * previewScreenScale: ScalarSignalMock | number;
+     * previewSize: Vec2SignalMock | Vector2;
+     * viewMatrix: TransformSignalMock;
+     * }} value 
+     */
+    static mockReset(value = {
+        'captureDevicePosition': null,
+        'isCapturingPhoto': null,
+        'isRecordingVideo': null,
+        'previewScreenScale': null,
+        'previewSize': null,
+        'viewMatrix': null
+    }) {
+        value['captureDevicePosition'] = (typeof value['captureDevicePosition'] === 'string') ? new StringSignalMock$1(value['captureDevicePosition']) : value['captureDevicePosition'];
+        value['isCapturingPhoto'] = (typeof value['isCapturingPhoto'] === 'boolean') ? new BoolSignalMock$1(value['isCapturingPhoto']) : value['isCapturingPhoto'];
+        value['isRecordingVideo'] = (typeof value['isRecordingVideo'] === 'boolean') ? new BoolSignalMock$1(value['isRecordingVideo']) : value['isRecordingVideo'];
+        value['previewScreenScale'] = (typeof value['previewScreenScale'] === 'number') ? new ScalarSignalMock$1(value['previewScreenScale']) : value['previewScreenScale'];
+        value['previewSize'] = (value['previewSize'] instanceof mathModule.Vector2) ? new Vec2SignalMock$1(value['previewSize']) : value['previewSize'];
+
+        cameraInfoModuleStructure['captureDevicePosition'] = value['captureDevicePosition'] ?? new StringSignalMock$1('x: 0, y: 0, z: 0');
+        cameraInfoModuleStructure['isCapturingPhoto'] = value['isCapturingPhoto'] ?? new BoolSignalMock$1(false);
+        cameraInfoModuleStructure['isRecordingVideo'] = value['isRecordingVideo'] ?? new BoolSignalMock$1(false);
+        cameraInfoModuleStructure['previewScreenScale'] = value['previewScreenScale'] ??  new ScalarSignalMock$1(0),
+        cameraInfoModuleStructure['previewSize'] = value['previewSize'] ?? new Vec2SignalMock$1(new mathModule.Vector2(0, 0));
+        cameraInfoModuleStructure['viewMatrix'] = value['viewMatrix'] ??  new TransformSignalMock$1({
+            position: new mathModule.Vector3(0, 0, 0),
+            rotation: new Quaternion(0, 0, 0, 0),
+            scale: new mathModule.Vector3(0, 0, 0)
+        });
+    }
+}
+
+const ms = new ScalarSignalMock$1(0);
+const deltaTimeMS = new ScalarSignalMock$1(0);
+
+ms.monitor().subscribe(async (/** @type {{ newValue: number; oldValue: number; }} */ v) => {
+    await deltaTimeMS.mockUpdate(v.newValue - v.oldValue);
+});
+
+/** @type {SubscriptionMock[]} */
+let subscriptions = [];
+
+class TimeMock {
+    static get deltaTimeMS() {
+        return deltaTimeMS;
+    }
+
+    static get ms() {
+        return ms;
+    }
+
+    /**
+     * @static
+     * @param {SubscriptionMock} subcription
+     * @memberof TimeMock
+     */
+    static clearInterval(subcription) {
+        subcription.unsubscribe();
+    }
+
+    /**
+     * @static
+     * @param {SubscriptionMock} subcription
+     * @memberof TimeMock
+     */
+    static clearTimeout(subcription) {
+        subcription.unsubscribe();
+    }
+
+    /**
+     * @static
+     * @param {Function} callback
+     * @param {number} delay
+     * @memberof TimeMock
+     */
+    static setInterval(callback, delay) {
+        return TimeMock.setIntervalWithSnapshot(undefined, callback, delay)
+    }
+
+    /**
+     *
+     *
+     * @static
+     * @param {*} snapshot
+     * @param {Function} callback
+     * @param {number} delay
+     * @return {*} 
+     * @memberof TimeMock
+     */
+    static setIntervalWithSnapshot(snapshot, callback, delay) {
+        let deltatime = 0;
+
+        let sub = ms.monitor().subscribeWithSnapshot(snapshot, (/** @type {{ newValue: number; oldValue: number; }} */ v) => {
+            deltatime += v.newValue - v.oldValue;
+            let times = Math.floor(deltatime / delay);
+
+            if (times >= 1) {
+                deltatime -= delay * times;
+
+                for (let i = 0; i < times; i++) callback();
+            }
+        });
+
+        subscriptions.push(sub);
+
+        return sub;
+    }
+
+    /**
+     * @static
+     * @param {Function} callback
+     * @param {number} delay
+     * @memberof TimeMock
+     */
+    static setTimeout(callback, delay) {
+        return TimeMock.setTimeoutWithSnapshot(undefined, callback, delay);
+    }
+
+    /**
+     * @static
+     * @param {*} snapshot
+     * @param {Function} callback
+     * @param {number} delay
+     * @memberof TimeMock
+     */
+    static setTimeoutWithSnapshot(snapshot, callback, delay) {
+        let deltatime = 0;
+
+        let sub = ms.monitor().subscribeWithSnapshot(snapshot, (/** @type {{ newValue: number; oldValue: number; }} */ v) => {
+            deltatime += v.newValue - v.oldValue;
+
+            if (deltatime >= delay) {
+                callback();
+                sub.unsubscribe();
+            }
+        });
+
+        subscriptions.push(sub);
+
+        return sub;
+    }
+
+    /**
+     * @static
+     * @param {number} number
+     * @memberof TimeMock
+     */
+    static async mockIncreaseMs(number) {
+        await ms.mockUpdate(ms.value + number);
+    }
+
+    static async mockReset() {
+        await ms.mockUpdate(0);
+        await deltaTimeMS.mockUpdate(0);
+
+        subscriptions.forEach(sub => sub.unsubscribe());
+        subscriptions = [];
+    }
+}
+
+class TimeDriverMock {
+    /**
+     * @param {number} durationMilliseconds
+     * @param {number} loopCount
+     * @param {boolean} mirror
+     * @memberof TimeDriverMock
+     */
+    constructor(durationMilliseconds, loopCount, mirror) {
+        this.durationMilliseconds = durationMilliseconds;
+        this.loopCount = loopCount;
+        this.mirror = mirror;
+
+        this._isRunning = new BoolSignalMock$1(false);
+
+        this.progress = new ScalarSignalMock$1(0);
+        this._reverse = false;
+        this._loop = 0;
+        this._updateSubscription = null;
+
+        this._onCompleted = new EventSourceMock();
+        this._onAfterIteration = new EventSourceMock();
+    }
+
+    start() {
+        if (this._isRunning.value) return;
+
+        this._updateSubscription = TimeMock.ms.monitor().subscribe(async (/** @type {{ newValue: number; oldValue: number; }} */ v) => {
+            await this._update(v.newValue - v.oldValue);
+        });
+
+        this._isRunning.mockUpdate(true);
+    }
+
+    stop() {
+        if (this._updateSubscription) this._updateSubscription.unsubscribe();
+
+        this._isRunning.mockUpdate(false);
+    }
+
+    reset() {
+        this.progress.mockUpdate(0);
+        this._reverse = false;
+        this._loop = 0;
+    }
+
+    reverse() {
+        this._reverse = !this._reverse;
+        this._loop = this.loopCount - this._loop - 1;
+    }
+
+    isRunning() {
+        return this._isRunning;
+    }
+
+    onCompleted() {
+        return this._onCompleted;
+    }
+
+    onAfterIteration() {
+        return this._onAfterIteration;
+    }
+
+    /**
+     * @param {number} deltatime
+     * @memberof TimeDriverMock
+     */
+    async _update(deltatime) {
+        if (!this._isRunning.value) return;
+
+        let progress = this.progress.value;
+        
+        if (this._reverse)
+            progress = progress - (deltatime / this.durationMilliseconds);
+        else
+            progress = progress + (deltatime / this.durationMilliseconds);
+
+        while (!(progress < 1 && progress >= 0)) {
+            this._loop += 1;
+
+            if (this.loopCount <= this._loop) {
+                await this._isRunning.mockUpdate(false);
+                await this._onCompleted.mockCallback();
+
+                await this._onAfterIteration.mockCallback();
+                break;
+            } else {
+                if (this.mirror) {
+                    this._reverse = !this._reverse;
+
+                    if (progress < 0) progress = Math.abs(progress);
+                    else progress = 1 - (progress - 1);
+
+                } else {
+                    if (progress < 0) progress = Math.abs(progress);
+                
+                    progress -= 1;
+                }
+            }
+            await this._onAfterIteration.mockCallback();
+        }
+
+        await this.progress.mockUpdate(progress);
+    }
+}
+
+class AnimationMock {
+    /**
+     * @static
+     * @param {{durationMilliseconds?: number, loopCount?: number, mirror?: false | true}} params
+     * @memberof AnimationMock
+     */
+    static timeDriver(params) {
+        let durationMilliseconds = params.durationMilliseconds ? params.durationMilliseconds : 0;
+        let loopCount = params.loopCount ? params.loopCount : 0;
+        let mirror = params.mirror ? params.mirror : false;
+
+        return new TimeDriverMock(durationMilliseconds, loopCount, mirror);
+    }
+
+    /**
+     * @static
+     * @param {TimeDriver} driver
+     * @param {ScalarSampler} sampler
+     * @memberof AnimationMock
+     */
+    static animate(driver, sampler) {
+        let scalar = new ScalarSignalMock$1(0);
+
+        driver.progress.monitor({ fireOnInitialValue: true }).subscribe(async () => {
+            await scalar.mockUpdate(sampler.curve(driver.progress.value));
+        });
+
+        return scalar;
+    }
+
+    static get samplers() {
+        return SamplerFactory
+    }
+}
+
+class ScalarSampler {
+    /**
+     * @param {Function} curve
+     * @memberof ScalarSampler
+     */
+    constructor(curve) {
+        this.curve = curve;
+    }
+}
+
+class SamplerFactory {
+    /**
+    * @static
+    * @param {number | number[]} from
+    * @param {number | number[]} to
+    * @returns {ScalarSampler | ScalarSampler[]}
+    * @memberof SamplerFactory
+    */
+    static linear(from, to) {
+        if (typeof from === 'number' && typeof to === 'number')
+            return new ScalarSampler((/** @type {number} */ t) => mathModule.AMath.lerp(from, to, t))
+        else {
+            // @ts-ignore
+            return from.map((e, index) => this.linear(e, to[index]))
+        }
+    }
+
+    /**
+    * @static
+    * @param {number | number[]} numberOfFrames
+    * @param {number | number[]} [startFrame = null] 
+    * @returns {ScalarSampler | ScalarSampler[]}
+    * @memberof SamplerFactory
+    */
+    static frame(numberOfFrames, startFrame) {
+        if (typeof numberOfFrames === 'number' && typeof startFrame === 'number') {
+            let startFrameValue = startFrame ?? 0;
+            return new ScalarSampler((/** @type {number} */ t) => Math.round(mathModule.AMath.lerp(0, numberOfFrames, t) + startFrameValue))
+        }
+        else {
+            // @ts-ignore
+            return numberOfFrames.map((e, index) => this.frame(e, startFrame[index]) ?? this.frame(e))
+        }
+    }
+
+    /**
+    * @static
+    * @param {number | number[]} from
+    * @param {number | number[]} to
+    * @returns {ScalarSampler | ScalarSampler[]}
+    * @memberof SamplerFactory
+    */
+    static easeInSine(from, to) {
+        if (typeof from === 'number' && typeof to === 'number') {
+            return new ScalarSampler((/** @type {number} */ x) => {
+                let t = 1 - Math.cos((x * Math.PI) / 2);
+                return mathModule.AMath.lerp(from, to, t)
+            })
+        } else {
+                // @ts-ignore
+                return from.map((e, index) => this.easeInSine(e, to[index]))
+        }
+    }
+
+    /**
+    * @static
+    * @param {number | number[]} from
+    * @param {number | number[]} to
+    * @returns {ScalarSampler | ScalarSampler[]}
+    * @memberof SamplerFactory
+    */
+    static easeOutSine(from, to) {
+        if (typeof from === 'number' && typeof to === 'number') {
+            return new ScalarSampler((/** @type {number} */ x) => {
+                let t = Math.sin((x * Math.PI) / 2);
+                return mathModule.AMath.lerp(from, to, t)
+            })
+        } else {
+                // @ts-ignore
+                return from.map((e, index) => this.easeOutSine(e, to[index]))
+        }
+    }
+
+    /**
+    * @static
+    * @param {number | number[]} from
+    * @param {number | number[]} to
+    * @returns {ScalarSampler | ScalarSampler[]}
+    * @memberof SamplerFactory
+    */
+    static easeInOutSine(from, to) {
+        if (typeof from === 'number' && typeof to === 'number') {
+            return new ScalarSampler((/** @type {number} */ x) => {
+                let t = -(Math.cos(Math.PI * x) - 1) / 2;
+                return mathModule.AMath.lerp(from, to, t)
+            })
+        } else {
+                // @ts-ignore
+                return from.map((e, index) => this.easeInOutSine(e, to[index]))
+        }
+    }
+
+    /**
+    * @static
+    * @param {number | number[]} from
+    * @param {number | number[]} to
+    * @returns {ScalarSampler | ScalarSampler[]}
+    * @memberof SamplerFactory
+    */
+    static easeInQuad(from, to) {
+        if (typeof from === 'number' && typeof to === 'number') {
+            return new ScalarSampler((/** @type {number} */ x) => {
+                let t = x * x;
+                return mathModule.AMath.lerp(from, to, t)
+            })
+        } else {
+                // @ts-ignore
+                return from.map((e, index) => this.easeInQuad(e, to[index]))
+        }
+    }
+
+    /**
+    * @static
+    * @param {number | number[]} from
+    * @param {number | number[]} to
+    * @returns {ScalarSampler | ScalarSampler[]}
+    * @memberof SamplerFactory
+    */
+    static easeOutQuad(from, to) {
+        if (typeof from === 'number' && typeof to === 'number') {
+            return new ScalarSampler((/** @type {number} */ x) => {
+                let t = 1 - (1 - x) * (1 - x);
+                return mathModule.AMath.lerp(from, to, t)
+            })
+        } else {
+                // @ts-ignore
+                return from.map((e, index) => this.easeOutQuad(e, to[index]))
+        }
+    }
+
+    /**
+    * @static
+    * @param {number | number[]} from
+    * @param {number | number[]} to
+    * @returns {ScalarSampler | ScalarSampler[]}
+    * @memberof SamplerFactory
+    */
+    static easeInOutQuad(from, to) {
+        if (typeof from === 'number' && typeof to === 'number') {
+            return new ScalarSampler((/** @type {number} */ x) => {
+                let t = x < 0.5 ? 2 * x * x : 1 - Math.pow(-2 * x + 2, 2) / 2;
+                return mathModule.AMath.lerp(from, to, t)
+            })
+        } else {
+                // @ts-ignore
+                return from.map((e, index) => this.easeInOutQuad(e, to[index]))
+        }
+    }
+
+    /**
+    * @static
+    * @param {number | number[]} from
+    * @param {number | number[]} to
+    * @returns {ScalarSampler | ScalarSampler[]}
+    * @memberof SamplerFactory
+    */
+    static easeInCubic(from, to) {
+        if (typeof from === 'number' && typeof to === 'number') {
+            return new ScalarSampler((/** @type {number} */ x) => {
+                let t = x * x * x;
+                return mathModule.AMath.lerp(from, to, t)
+            })
+        } else {
+                // @ts-ignore
+                return from.map((e, index) => this.easeInCubic(e, to[index]))
+        }
+    }
+
+    /**
+    * @static
+    * @param {number | number[]} from
+    * @param {number | number[]} to
+    * @returns {ScalarSampler | ScalarSampler[]}
+    * @memberof SamplerFactory
+    */
+    static easeOutCubic(from, to) {
+        if (typeof from === 'number' && typeof to === 'number') {
+            return new ScalarSampler((/** @type {number} */ x) => {
+                let t = 1 - Math.pow(1 - x, 3);
+                return mathModule.AMath.lerp(from, to, t)
+            })
+        } else {
+                // @ts-ignore
+                return from.map((e, index) => this.easeOutCubic(e, to[index]))
+        }
+    }
+
+    /**
+    * @static
+    * @param {number | number[]} from
+    * @param {number | number[]} to
+    * @returns {ScalarSampler | ScalarSampler[]}
+    * @memberof SamplerFactory
+    */
+    static easeInOutCubic(from, to) {
+        if (typeof from === 'number' && typeof to === 'number') {
+            return new ScalarSampler((/** @type {number} */ x) => {
+                let t = x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+                return mathModule.AMath.lerp(from, to, t)
+            })
+        } else {
+                // @ts-ignore
+                return from.map((e, index) => this.easeInOutCubic(e, to[index]))
+        }
+    }
+
+    /**
+    * @static
+    * @param {number | number[]} from
+    * @param {number | number[]} to
+    * @returns {ScalarSampler | ScalarSampler[]}
+    * @memberof SamplerFactory
+    */
+    static easeInQuart(from, to) {
+        if (typeof from === 'number' && typeof to === 'number') {
+            return new ScalarSampler((/** @type {number} */ x) => {
+                let t = x * x * x * x;
+                return mathModule.AMath.lerp(from, to, t)
+            })
+        } else {
+                // @ts-ignore
+                return from.map((e, index) => this.easeInQuart(e, to[index]))
+        }
+    }
+
+    /**
+    * @static
+    * @param {number | number[]} from
+    * @param {number | number[]} to
+    * @returns {ScalarSampler | ScalarSampler[]}
+    * @memberof SamplerFactory
+    */
+    static easeOutQuart(from, to) {
+        if (typeof from === 'number' && typeof to === 'number') {
+            return new ScalarSampler((/** @type {number} */ x) => {
+                let t = 1 - Math.pow(1 - x, 4);
+                return mathModule.AMath.lerp(from, to, t)
+            })
+        } else {
+                // @ts-ignore
+                return from.map((e, index) => this.lineaseOutQuartear(e, to[index]))
+        }
+    }
+
+    /**
+    * @static
+    * @param {number | number[]} from
+    * @param {number | number[]} to
+    * @returns {ScalarSampler | ScalarSampler[]}
+    * @memberof SamplerFactory
+    */
+    static easeInOutQuart(from, to) {
+        if (typeof from === 'number' && typeof to === 'number') {
+            return new ScalarSampler((/** @type {number} */ x) => {
+                let t = x < 0.5 ? 8 * x * x * x * x : 1 - Math.pow(-2 * x + 2, 4);
+                return mathModule.AMath.lerp(from, to, t)
+            })
+        } else {
+                // @ts-ignore
+                return from.map((e, index) => this.easeInOutQuart(e, to[index]))
+        }
+    }
+
+    /**
+    * @static
+    * @param {number | number[]} from
+    * @param {number | number[]} to
+    * @returns {ScalarSampler | ScalarSampler[]}
+    * @memberof SamplerFactory
+    */
+    static easeInQuint(from, to) {
+        if (typeof from === 'number' && typeof to === 'number') {
+            return new ScalarSampler((/** @type {number} */ x) => {
+                let t = x * x * x * x * x;
+                return mathModule.AMath.lerp(from, to, t)
+            })
+        } else {
+                // @ts-ignore
+                return from.map((e, index) => this.easeInQuint(e, to[index]))
+        }
+    }
+
+    /**
+    * @static
+    * @param {number | number[]} from
+    * @param {number | number[]} to
+    * @returns {ScalarSampler | ScalarSampler[]}
+    * @memberof SamplerFactory
+    */
+    static easeOutQuint(from, to) {
+        if (typeof from === 'number' && typeof to === 'number') {
+            return new ScalarSampler((/** @type {number} */ x) => {
+                let t = 1 - Math.pow(1 - x, 5);
+                return mathModule.AMath.lerp(from, to, t)
+            })
+        } else {
+                // @ts-ignore
+                return from.map((e, index) => this.easeOutQuint(e, to[index]))
+        }
+    }
+
+    /**
+    * @static
+    * @param {number | number[]} from
+    * @param {number | number[]} to
+    * @returns {ScalarSampler | ScalarSampler[]}
+    * @memberof SamplerFactory
+    */
+    static easeInOutQuint(from, to) {
+        if (typeof from === 'number' && typeof to === 'number') {
+            return new ScalarSampler((/** @type {number} */ x) => {
+                let t = x < 0.5 ? 16 * x * x * x * x * x : 1 - Math.pow(-2 * x + 2, 5) / 2;
+                return mathModule.AMath.lerp(from, to, t)
+            })
+        } else {
+                // @ts-ignore
+                return from.map((e, index) => this.easeInOutQuint(e, to[index]))
+        }
+    }
+
+    /**
+    * @static
+    * @param {number | number[]} from
+    * @param {number | number[]} to
+    * @returns {ScalarSampler | ScalarSampler[]}
+    * @memberof SamplerFactory
+    */
+    static easeInExpo(from, to) {
+        if (typeof from === 'number' && typeof to === 'number') {
+            return new ScalarSampler((/** @type {number} */ x) => {
+                let t = x === 0 ? 0 : Math.pow(2, 10 * x - 10);
+                return mathModule.AMath.lerp(from, to, t)
+            })
+        } else {
+                // @ts-ignore
+                return from.map((e, index) => this.easeInExpo(e, to[index]))
+        }
+    }
+
+    /**
+    * @static
+    * @param {number | number[]} from
+    * @param {number | number[]} to
+    * @returns {ScalarSampler | ScalarSampler[]}
+    * @memberof SamplerFactory
+    */
+    static easeOutExpo(from, to) {
+        if (typeof from === 'number' && typeof to === 'number') {
+            return new ScalarSampler((/** @type {number} */ x) => {
+                let t = x === 1 ? 1 : 1 - Math.pow(2, -10 * x);
+                return mathModule.AMath.lerp(from, to, t)
+            })
+        } else {
+                // @ts-ignore
+                return from.map((e, index) => this.easeOutExpo(e, to[index]))
+        }
+    }
+
+    /**
+    * @static
+    * @param {number | number[]} from
+    * @param {number | number[]} to
+    * @returns {ScalarSampler | ScalarSampler[]}
+    * @memberof SamplerFactory
+    */
+    static easeInOutExpo(from, to) {
+        if (typeof from === 'number' && typeof to === 'number') {
+            return new ScalarSampler((/** @type {number} */ x) => {
+                let t = x === 0
+                    ? 0
+                    : x === 1
+                        ? 1
+                        : x < 0.5 ? Math.pow(2, 20 * x - 10) / 2
+                            : (2 - Math.pow(2, -20 * x + 10)) / 2;
+
+                return mathModule.AMath.lerp(from, to, t)
+            })
+        } else {
+                // @ts-ignore
+                return from.map((e, index) => this.easeInOutExpo(e, to[index]))
+        }
+    }
+
+    /**
+    * @static
+    * @param {number | number[]} from
+    * @param {number | number[]} to
+    * @returns {ScalarSampler | ScalarSampler[]}
+    * @memberof SamplerFactory
+    */
+    static easeInCirc(from, to) {
+        if (typeof from === 'number' && typeof to === 'number') {
+            return new ScalarSampler((/** @type {number} */ x) => {
+                let t = 1 - Math.sqrt(1 - Math.pow(x, 2));
+                return mathModule.AMath.lerp(from, to, t)
+            })
+        } else {
+                // @ts-ignore
+                return from.map((e, index) => this.easeInCirc(e, to[index]))
+        }
+    }
+
+    /**
+    * @static
+    * @param {number | number[]} from
+    * @param {number | number[]} to
+    * @returns {ScalarSampler | ScalarSampler[]}
+    * @memberof SamplerFactory
+    */
+    static easeOutCirc(from, to) {
+        if (typeof from === 'number' && typeof to === 'number') {
+            return new ScalarSampler((/** @type {number} */ x) => {
+                let t = Math.sqrt(1 - Math.pow(x - 1, 2));
+                return mathModule.AMath.lerp(from, to, t)
+            })
+        } else {
+                // @ts-ignore
+                return from.map((e, index) => this.easeOutCirc(e, to[index]))
+        }
+    }
+
+    /**
+    * @static
+    * @param {number | number[]} from
+    * @param {number | number[]} to
+    * @returns {ScalarSampler | ScalarSampler[]}
+    * @memberof SamplerFactory
+    */
+    static easeInOutCirc(from, to) {
+        if (typeof from === 'number' && typeof to === 'number') {
+            return new ScalarSampler((/** @type {number} */ x) => {
+                let t = x < 0.5
+                    ? (1 - Math.sqrt(1 - Math.pow(2 * x, 2))) / 2
+                    : (Math.sqrt(1 - Math.pow(-2 * x + 2, 2)) + 1) / 2;
+
+                return mathModule.AMath.lerp(from, to, t)
+            })
+        } else {
+                // @ts-ignore
+                return from.map((e, index) => this.easeInOutCirc(e, to[index]))
+        }
+    }
+
+    /**
+    * @static
+    * @param {number | number[]} from
+    * @param {number | number[]} to
+    * @returns {ScalarSampler | ScalarSampler[]}
+    * @memberof SamplerFactory
+    */
+    static easeInBack(from, to) {
+        if (typeof from === 'number' && typeof to === 'number') {
+            return new ScalarSampler((/** @type {number} */ x) => {
+                let c1 = 1.70158;
+                let c3 = c1 + 1;
+                let t = c3 * x * x * x - c1 * x * x;
+
+                return mathModule.AMath.lerp(from, to, t)
+            })
+        } else {
+                // @ts-ignore
+                return from.map((e, index) => this.easeInBack(e, to[index]))
+        }
+    }
+    /**
+    * @static
+    * @param {number | number[]} from
+    * @param {number | number[]} to
+    * @returns {ScalarSampler | ScalarSampler[]}
+    * @memberof SamplerFactory
+    */
+    static easeOutBack(from, to) {
+        if (typeof from === 'number' && typeof to === 'number') {
+            return new ScalarSampler((/** @type {number} */ x) => {
+                let c1 = 1.70158;
+                let c3 = c1 + 1;
+                let t = 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2);
+
+                return mathModule.AMath.lerp(from, to, t)
+            })
+        } else {
+                // @ts-ignore
+                return from.map((e, index) => this.easeOutBack(e, to[index]))
+        }
+    }
+    /**
+    * @static
+    * @param {number | number[]} from
+    * @param {number | number[]} to
+    * @returns {ScalarSampler | ScalarSampler[]}
+    * @memberof SamplerFactory
+    */
+    static easeInOutBack(from, to) {
+        if (typeof from === 'number' && typeof to === 'number') {
+            return new ScalarSampler((/** @type {number} */ x) => {
+                let c1 = 1.70158;
+                let c2 = c1 * 1.525;
+                let t = x < 0.5
+                    ? (Math.pow(2 * x, 2) * ((c2 + 1) * 2 * x - c2)) / 2
+                    : (Math.pow(2 * x - 2, 2) * ((c2 + 1) * (x * 2 - 2) + c2) + 2) / 2;
+
+                return mathModule.AMath.lerp(from, to, t)
+            })
+        } else {
+                // @ts-ignore
+                return from.map((e, index) => this.easeInOutBack(e, to[index]))
+        }
+    }
+
+    /**
+    * @static
+    * @param {number | number[]} from
+    * @param {number | number[]} to
+    * @returns {ScalarSampler | ScalarSampler[]}
+    * @memberof SamplerFactory
+    */
+    static easeInElastic(from, to) {
+        if (typeof from === 'number' && typeof to === 'number') {
+            return new ScalarSampler((/** @type {number} */ x) => {
+                let t = x === 0
+                    ? 0
+                    : x === 1
+                        ? 1
+                        // @ts-ignore
+                        : -Math.pow(2, 10 * x - 10) * Math.sin((x * 10 - 10.75) * c4);
+
+                return mathModule.AMath.lerp(from, to, t)
+            })
+        } else {
+                // @ts-ignore
+                return from.map((e, index) => this.easeInElastic(e, to[index]))
+        }
+    }
+    /**
+    * @static
+    * @param {number | number[]} from
+    * @param {number | number[]} to
+    * @returns {ScalarSampler | ScalarSampler[]}
+    * @memberof SamplerFactory
+    */
+    static easeOutElastic(from, to) {
+        if (typeof from === 'number' && typeof to === 'number') {
+            return new ScalarSampler((/** @type {number} */ x) => {
+                let c4 = (2 * Math.PI) / 3;
+                let t = x === 0
+                    ? 0
+                    : x === 1
+                        ? 1
+                        : Math.pow(2, -10 * x) * Math.sin((x * 10 - 0.75) * c4) + 1;
+
+                return mathModule.AMath.lerp(from, to, t)
+            })
+        } else {
+                // @ts-ignore
+                return from.map((e, index) => this.easeOutElastic(e, to[index]))
+        }
+    }
+
+    /**
+    * @static
+    * @param {number | number[]} from
+    * @param {number | number[]} to
+    * @returns {ScalarSampler | ScalarSampler[]}
+    * @memberof SamplerFactory
+    */
+    static easeInOutElastic(from, to) {
+        if (typeof from === 'number' && typeof to === 'number') {
+            return new ScalarSampler((/** @type {number} */ x) => {
+                let c5 = (2 * Math.PI) / 4.5;
+                let t = x === 0
+                    ? 0
+                    : x === 1
+                        ? 1
+                        : x < 0.5
+                            ? -(Math.pow(2, 20 * x - 10) * Math.sin((20 * x - 11.125) * c5)) / 2
+                            : (Math.pow(2, -20 * x + 10) * Math.sin((20 * x - 11.125) * c5));
+
+                return mathModule.AMath.lerp(from, to, t)
+            })
+        } else {
+                // @ts-ignore
+                return from.map((e, index) => this.easeInOutElastic(e, to[index]))
+        }
+    }
+
+    /**
+    * @static
+    * @param {number | number[]} from
+    * @param {number | number[]} to
+    * @returns {ScalarSampler | ScalarSampler[]}
+    * @memberof SamplerFactory
+    */
+    static easeInBounce(from, to) {
+        if (typeof from === 'number' && typeof to === 'number') {
+            return new ScalarSampler((/** @type {number} */ x) => {
+                /**
+                 * @param {number} x 
+                 * @returns 
+                 */
+                function easeOutBounce(x) {
+                    let n1 = 7.5625;
+                    let d1 = 2.75;
+
+                    if (x < 1 / d1) {
+                        return n1 * x * x;
+                    } else if (x < 2 / d1) {
+                        return n1 * (x -= 1.5 / d1) * x + 0.75;
+                    } else if (x < 2.5 / d1) {
+                        return n1 * (x -= 2.25 / d1) * x + 0.9375;
+                    } else {
+                        return n1 * (x -= 2.625 / d1) * x + 0.984375;
+                    }
+                }
+                // @ts-ignore
+                function easeInBounce(x) {
+                    return 1 - easeOutBounce(1 - x);
+                }
+                let t = easeInBounce(x);
+
+                return mathModule.AMath.lerp(from, to, t)
+            })
+        } else {
+                // @ts-ignore
+                return from.map((e, index) => this.easeInBounce(e, to[index]))
+        }
+    }
+
+    /**
+    * @static
+    * @param {number | number[]} from
+    * @param {number | number[]} to
+    * @returns {ScalarSampler | ScalarSampler[]}
+    * @memberof SamplerFactory
+    */
+    static easeOutBounce(from, to) {
+        if (typeof from === 'number' && typeof to === 'number') {
+            return new ScalarSampler((/** @type {number} */ x) => {
+                /**
+                 * @param {number} x 
+                 * @returns 
+                 */
+                function easeOutBounce(x) {
+                    let n1 = 7.5625;
+                    let d1 = 2.75;
+
+                    if (x < 1 / d1) {
+                        return n1 * x * x;
+                    } else if (x < 2 / d1) {
+                        return n1 * (x -= 1.5 / d1) * x + 0.75;
+                    } else if (x < 2.5 / d1) {
+                        return n1 * (x -= 2.25 / d1) * x + 0.9375;
+                    } else {
+                        return n1 * (x -= 2.625 / d1) * x + 0.984375;
+                    }
+                }
+                let t = easeOutBounce(x);
+
+                return mathModule.AMath.lerp(from, to, t)
+            })
+        } else {
+                // @ts-ignore
+                return from.map((e, index) => this.easeOutBounce(e, to[index]))
+        }
+    }
+
+    /**
+    * @static
+    * @param {number | number[]} from
+    * @param {number | number[]} to
+    * @returns {ScalarSampler | ScalarSampler[]}
+    * @memberof SamplerFactory
+    */
+    static easeInOutBounce(from, to) {
+        if (typeof from === 'number' && typeof to === 'number') {
+            return new ScalarSampler((/** @type {number} */ x) => {
+                /**
+                 * @param {number} x 
+                 * @returns 
+                 */
+                function easeOutBounce(x) {
+                    let n1 = 7.5625;
+                    let d1 = 2.75;
+
+                    if (x < 1 / d1) {
+                        return n1 * x * x;
+                    } else if (x < 2 / d1) {
+                        return n1 * (x -= 1.5 / d1) * x + 0.75;
+                    } else if (x < 2.5 / d1) {
+                        return n1 * (x -= 2.25 / d1) * x + 0.9375;
+                    } else {
+                        return n1 * (x -= 2.625 / d1) * x + 0.984375;
+                    }
+                }
+                let t = x < 0.5
+                    ? (1 - easeOutBounce(1 - 2 * x)) / 2
+                    : (1 + easeOutBounce(2 * x - 1)) / 2;
+
+                return mathModule.AMath.lerp(from, to, t)
+            })
+        } else {
+                // @ts-ignore
+                return from.map((e, index) => this.easeInOutBounce(e, to[index]))
+        }
+    }
+
+    /**
+     * @static
+     * @param {number | number[]} value
+     * @memberof SamplerFactory
+     * @returns {ScalarSampler | ScalarSampler[]}
+     */
+    static constant(value) {
+        if (typeof value === 'number') {
+            // @ts-ignore
+            return new ScalarSampler((/** @type {number} */ t) => value)
+        } else {
+            if (value instanceof Array)
+                // @ts-ignore
+                return value.map((e) => this.constant(e))
+        }
+    }
+
+    /**
+     * @static
+     * @param {number | number[]} p0 
+     * @param {number | number[]} p1 
+     * @param {number | number[]} p2 
+     * @param {number | number[]} p3 
+     * @returns {ScalarSampler | ScalarSampler[]}
+     * @memberof SamplerFactory
+     */
+    static bezier(p0, p1, p2, p3) {
+        if (typeof p0 === 'number' && typeof p1 === 'number' && typeof p2 === 'number' && typeof p3 === 'number') {
+            // @ts-ignore
+            return new ScalarSampler((/** @type {number} */ t) => ((1 - t) ** 3) * p0 + 3.0 * t * ((1 - t) ** 2) * p1 + 3.0 * (t ** 2) * (1 - t) * p2.x + (t ** 3) * p3)
+        } else {
+            // @ts-ignore
+            if (p0.length == p1.length && p0.length == p2.length && p0.length == p3.length)
+                // @ts-ignore
+                return p0.map((e, index) => this.bezier(e, p1[index], p2[p3[index]]))
+        }
+
+    }
+}
 
 /**
  * @exports
@@ -7951,7 +7473,7 @@ class SceneObjectBaseMock {
 
         params.transform = params.transform ?? {};
 
-        this._transform = new TransformSignalMock({
+        this._transform = new TransformSignalMock$1({
             position: new mathModule.Vector3(params.transform.x ?? 0, params.transform.y ?? 0, params.transform.z ?? 0),
             rotation: new Quaternion(params.transform.rotationW ?? 1, params.transform.rotationX ?? 0, params.transform.rotationY ?? 0, params.transform.rotationZ ?? 0),
             scale: new mathModule.Vector3(params.transform.scaleX ?? 1, params.transform.scaleY ?? 1, params.transform.scaleZ ?? 1),
@@ -8377,6 +7899,50 @@ class SceneMock {
     }
 }
 
+/**
+ * @exports
+ * @typedef {Object} TextureBaseMockParams
+ * @property {string} name
+ * @property {number} [height]
+ * @property {number} [width]
+ * @property {any} [signal]
+ * @property {string} [type]
+ */
+
+class TextureBaseMock {
+    /**
+     * @param {TextureBaseMockParams} params 
+     * @memberof SceneObjectBaseMock 
+     */
+    constructor(params) {
+        this._identifier = (params.type ?? 'texture') + ':' + Math.round(Math.random() * 10000);
+        this._name = params.name;
+        this._signal = params.signal ?? null;
+        this._height = new ScalarSignalMock$1(params.height ?? 0);  
+        this._width = new ScalarSignalMock$1(params.width ?? 0);  
+    }
+
+    get identifier() {
+        return this._identifier;
+    }
+
+    get name() {
+        return this._name;
+    }
+
+    get signal() {
+        return this._signal;
+    }
+
+    get height() {
+        return this._height;
+    }
+
+    get width() {
+        return this._width;
+    }
+}
+
 /** @type {TextureBaseMock[]} */
 let TextureStructure = [];
 
@@ -8416,131 +7982,548 @@ class TexturesMock {
 
 /**
  * @exports
- * @typedef {Object} BlockModulesConfig
- * @property {{[key: string]: any}} extras
- * @property {string} multipeerId
- * @property {StorageLocation} storage
+ * @typedef {Object} MaterialBaseMockParams
+ * @property {string} name
+ * @property {number} [alphaCutoff]
+ * @property {boolean} [alphaTestEnabled]
+ * @property {boolean} [depthTestEnabled]
+ * @property {boolean} [depthWriteEnabled]
+ * @property {TextureBase} [diffuse]
+ * @property {boolean} [doubleSided]
+ * @property {number} [opacity]
+ * @property {string} [type]
  */
 
-class BlocksMock {
+class MaterialBaseMock {
     /**
-     * @param {string} blockName 
-     * @param {import("./Scene/SceneObjectBase.mock").SceneObjectBaseMockParams} initialState
-     * @param {BlockModulesConfig | {}} config
+     * @param {MaterialBaseMockParams} params 
+     * @memberof SceneObjectBaseMock 
      */
-    static instantiate(blockName, initialState = {name: 'dynamicBlock'}, config = {}) {
-        return SceneMock.create('Block', initialState)
+    constructor(params) {
+        this._identifier = (params.type ?? 'material') + ':' + Math.round(Math.random() * 10000);
+        this._name = params.name;
+        this._alphaCutoff = new ScalarSignalMock$1(params.alphaCutoff ?? 0);
+        this._alphaTestEnabled = new BoolSignalMock$1(params.alphaTestEnabled ?? false);
+        this._depthTestEnabled = new BoolSignalMock$1(params.depthTestEnabled ?? false);
+        this._depthWriteEnabled = new BoolSignalMock$1(params.depthWriteEnabled ?? false);
+        this._diffuse = params.diffuse ?? null;
+        this._doubleSided = new BoolSignalMock$1(params.doubleSided ?? false);
+        this._opacity = new ScalarSignalMock$1(params.opacity ?? 0);
+    }
+
+    get identifier() {
+        return this._identifier;
+    }
+
+    get name() {
+        return this._name;
+    }
+
+    get alphaCutoff() {
+        return this._alphaCutoff;
+    }
+
+    set alphaCutoff(value) {
+        this._alphaCutoff.mockUpdate(value);
+    }
+
+    get alphaTestEnabled() {
+        return this._alphaTestEnabled;
+    }
+
+    set alphaTestEnabled(value) {
+        this._alphaTestEnabled.mockUpdate(value);
+    }
+
+    get depthTestEnabled() {
+        return this._alphaTestEnabled;
+    }
+
+    set depthTestEnabled(value) {
+        this._depthTestEnabled.mockUpdate(value);
+    }
+
+    get depthWriteEnabled() {
+        return this._depthWriteEnabled;
+    }
+
+    set depthWriteEnabled(value) {
+        this._depthWriteEnabled.mockUpdate(value);
+    }
+
+    get diffuse() {
+        return this._diffuse;
+    }
+   
+    get doubleSided() {
+        return this._doubleSided;
+    }
+
+    set doubleSided(value) {
+        this._doubleSided.mockUpdate(value);
+    }
+
+    get opacity() {
+        return this._opacity;
+    }
+
+    set opacity(value) {
+        this._opacity.mockUpdate(value);
+    }
+
+    async getDiffuse() {
+        return this._diffuse;
     }
 }
 
-let cameraInfoModuleStructure = {
-    'captureDevicePosition': new StringSignalMock('x: 0, y: 0, z: 0'),
-    'isCapturingPhoto': new BoolSignalMock$1(false),
-    'isRecordingVideo': new BoolSignalMock$1(false),
-    'previewScreenScale': new ScalarSignalMock$1(0),
-    'previewSize': new Vec2SignalMock$1(new mathModule.Vector2(0, 0)),
-    'viewMatrix': new TransformSignalMock({
-        position: new mathModule.Vector3(0, 0, 0),
-        rotation: new Quaternion(0, 0, 0, 0),
-        scale: new mathModule.Vector3(0, 0, 0)
-    })
-};
+/** @type {MaterialBaseMock[]} */
+let MaterialStructure = [];
 
-class CameraInfoModuleMock {
-
-    static get captureDevicePosition() {
-        return cameraInfoModuleStructure['captureDevicePosition']
+class MaterialsMock {
+    /**
+     * @param {string} materialName 
+     */
+    static async findFirst(materialName) {
+        let result = MaterialStructure.filter(mat => mat.name == materialName)[0];
+        return result ?? null;
     }
 
-    static get isCapturingPhoto() {
-        return cameraInfoModuleStructure['isCapturingPhoto']
+    static async getAll() {
+        return MaterialStructure
     }
+    
+    /**
+     * @param {string} namePattern 
+     * @param {{limit?: number}} config 
+     */
+    static async findUsingPattern(namePattern, config = {}) {
+        if (namePattern.charAt(0) === '*') namePattern = '.' + namePattern;
 
-    static get isRecordingVideo() {
-        return cameraInfoModuleStructure['isRecordingVideo']
-    }
+        let result = MaterialStructure.filter(mat => mat.name.match(namePattern));
 
-    static get previewScreenScale() {
-        return cameraInfoModuleStructure['previewScreenScale']
-    }
-
-    static get previewSize() {
-        return cameraInfoModuleStructure['previewSize']
-    }
-
-    static get viewMatrix() {
-        return cameraInfoModuleStructure['viewMatrix']
+        return result.slice(0, config.limit ?? result.length);
     }
 
     /**
-     * @param {{
-     * captureDevicePosition: StringSignalMock | string; 
-     * isCapturingPhoto: BoolSignalMock | boolean;
-     * isRecordingVideo: BoolSignalMock | boolean;
-     * previewScreenScale: ScalarSignalMock | number;
-     * previewSize: Vec2SignalMock | Vector2;
-     * viewMatrix: TransformSignalMock;
-     * }} value 
+     * @param {import("./MaterialBase.mock").MaterialBaseMockParams[]} structure
+     * @memberof SceneMock
      */
-    static mockReset(value = {
-        'captureDevicePosition': null,
-        'isCapturingPhoto': null,
-        'isRecordingVideo': null,
-        'previewScreenScale': null,
-        'previewSize': null,
-        'viewMatrix': null
-    }) {
-        value['captureDevicePosition'] = (typeof value['captureDevicePosition'] === 'string') ? new StringSignalMock(value['captureDevicePosition']) : value['captureDevicePosition'];
-        value['isCapturingPhoto'] = (typeof value['isCapturingPhoto'] === 'boolean') ? new BoolSignalMock$1(value['isCapturingPhoto']) : value['isCapturingPhoto'];
-        value['isRecordingVideo'] = (typeof value['isRecordingVideo'] === 'boolean') ? new BoolSignalMock$1(value['isRecordingVideo']) : value['isRecordingVideo'];
-        value['previewScreenScale'] = (typeof value['previewScreenScale'] === 'number') ? new ScalarSignalMock$1(value['previewScreenScale']) : value['previewScreenScale'];
-        value['previewSize'] = (value['previewSize'] instanceof mathModule.Vector2) ? new Vec2SignalMock$1(value['previewSize']) : value['previewSize'];
+    static mockReset(structure = []) {
+        MaterialStructure = structure.map(s => new MaterialBaseMock(s)) ?? [];
+    }
 
-        cameraInfoModuleStructure['captureDevicePosition'] = value['captureDevicePosition'] ?? new StringSignalMock('x: 0, y: 0, z: 0');
-        cameraInfoModuleStructure['isCapturingPhoto'] = value['isCapturingPhoto'] ?? new BoolSignalMock$1(false);
-        cameraInfoModuleStructure['isRecordingVideo'] = value['isRecordingVideo'] ?? new BoolSignalMock$1(false);
-        cameraInfoModuleStructure['previewScreenScale'] = value['previewScreenScale'] ??  new ScalarSignalMock$1(0),
-        cameraInfoModuleStructure['previewSize'] = value['previewSize'] ?? new Vec2SignalMock$1(new mathModule.Vector2(0, 0));
-        cameraInfoModuleStructure['viewMatrix'] = value['viewMatrix'] ??  new TransformSignalMock({
-            position: new mathModule.Vector3(0, 0, 0),
-            rotation: new Quaternion(0, 0, 0, 0),
-            scale: new mathModule.Vector3(0, 0, 0)
-        });
+}
+
+/** @type {Object<string, SignalMock|EventSourceMock>} */
+let  PatchesStructureInputs = {};
+
+class PatchesInputsMock {
+    /**
+     * @param {string} name 
+     * @param {SignalMock | boolean | number | string} signal 
+     */
+    static async set(name, signal) {
+        let value;
+        switch (typeof signal) {
+            case 'string':
+                value = new StringSignalMock$1(signal);
+                break;
+
+            case 'boolean':
+                value = new BoolSignalMock$1(signal);
+                break;
+
+            case 'number':
+                value = new ScalarSignalMock$1(signal);
+                break;
+
+            default:
+                value = signal;
+        }
+        PatchesStructureInputs[name] = value;
+    }
+
+    /** 
+     * @param {string} name 
+     * @param {BoolSignalMock | boolean} signal 
+     */
+    static async setBoolean(name, signal) {
+        let value;
+        switch (typeof signal) {
+            case 'boolean':
+                value = new BoolSignalMock$1(signal);
+                break;
+            default:
+                value = signal;
+        }
+        PatchesStructureInputs[name] = value;
+    }
+
+    /**
+     * @param {string} name 
+     * @param {SignalMock} signal 
+     */
+    static async setColor(name, signal) {
+        PatchesStructureInputs[name] = signal;
+    }
+
+    /** 
+     * @param {string} name 
+     * @param {ScalarSignalMock | number} signal 
+     */
+    static async setScalar(name, signal) {
+        let value;
+        switch (typeof signal) {
+            case 'number':
+                value = new ScalarSignalMock$1(signal);
+                break;
+
+            default:
+                value = signal;
+        }
+        PatchesStructureInputs[name] = value;
+    }
+
+    /** 
+     * @param {string} name 
+     * @param {StringSignalMock | string} signal 
+     */
+    static async setString(name, signal) {
+        let value;
+        switch (typeof signal) {
+            case 'string':
+                value = new StringSignalMock$1(signal);
+                break;
+
+            default:
+                value = signal;
+        }
+        PatchesStructureInputs[name] = value;
+    }
+
+    /** 
+     * @param {string} name 
+     * @param {VectorSignalMock} signal 
+     */
+    static async setPoint(name, signal) {
+        PatchesStructureInputs[name] = signal;
+    }
+
+    /** 
+     * @param {string} name 
+     * @param {Vec2SignalMock} signal 
+     */
+    static async setPoint2D(name, signal) {
+        PatchesStructureInputs[name] = signal;
+    }
+
+    /** 
+     * @param {string} name 
+     * @param {VectorSignalMock} signal 
+     */
+    static async setVector(name, signal) {
+        PatchesStructureInputs[name] = signal;
+    }
+
+    /** 
+     * @param {string} name 
+     * @param {EventSourceMock} signal 
+     */
+    static async setPulse(name, signal) {
+        PatchesStructureInputs[name] = signal;
+    }
+
+    static mockReset() {
+        PatchesStructureInputs = {};
+    }
+
+    static mockGetPatchesStructureInputs() {
+        return PatchesStructureInputs
     }
 }
 
-let print = true;
+/** @type {Object<string, SignalMock|EventSourceMock>} */
+let PatchesStructureOutputs = {};
 
-class DiagnosticsMock {
+//Skipped getColor, getColorOrFallback methods
+class PatchesOuputsMock {
     /**
-     * @static
-     * @param {string} text
-     * @memberof DiagnosticsMock
+     * @param {string} name 
      */
-    static error(text) { if (print) console.log(text); }
-
-    /**
-     * @static
-     * @param {string} text
-     * @memberof DiagnosticsMock
-     */
-    static log(text) { if (print) console.log(text); }
+   static async get(name) {
+        return PatchesStructureOutputs[name]
+   }
 
     /**
-     * @static
-     * @param {string} text
-     * @memberof DiagnosticsMock
+     * @param {string} name 
+     * @returns {Promise<BoolSignalMock>}
      */
-    static warn(text) { if (print) console.log(text); }
+    static async getBoolean(name) {
+        if (!(PatchesStructureOutputs[name] instanceof BoolSignalMock$1)) 
+            throw new TypeError(`Expected BoolSignalMock but got: ${typeof PatchesStructureOutputs[name]}`);
+        return /**@type {BoolSignalMock}*/ (PatchesStructureOutputs[name])
+   } 
+   
+    /**
+     * @param {string} name 
+     * @param {BoolSignalMock | boolean} fallback 
+     * @returns {Promise<BoolSignalMock>}
+     */
+    static async getBooleanOrFallback(name, fallback) {
+        let value;
+        if (!(PatchesStructureOutputs[name] instanceof BoolSignalMock$1)) {
+            if (typeof fallback == 'boolean') value = new BoolSignalMock$1(fallback);
+            else value = fallback; 
+        }
+        else 
+            value = PatchesStructureOutputs[name];
+        return /**@type {BoolSignalMock}*/ (value)
+   }
+   
+   /**
+    * @param {string} name 
+    * @param {SignalMock | boolean | number | string} fallback 
+    * @returns {Promise<SignalMock>}
+    */
+   static async getOrFallback(name, fallback) {
+    let value;
+    if (!(PatchesStructureOutputs[name] instanceof SignalMock)) {
+        switch (typeof fallback) {
+            case 'boolean':
+                value = new BoolSignalMock$1(fallback);
+                break;
 
-    static watch() { }
+            case 'number':
+                value = new ScalarSignalMock$1(fallback);
+                break;
+            
+            case 'string':
+                value = new StringSignalMock$1(fallback);
+                break;
 
-    static mockLogDisable() {
-        print = false;
+            default:
+                value = fallback;
+        }
+    }
+    else 
+        value = PatchesStructureOutputs[name];
+    return /**@type {SignalMock}*/ (value)
+   }
+
+    /**
+    * @param {string} name 
+    * @returns {Promise<VectorSignalMock>}
+    */
+    static async getPoint(name) {
+        if (!(PatchesStructureOutputs[name] instanceof VectorSignalMock)) 
+            throw new TypeError(`Expected VectorSignalMock`);
+        return /**@type {VectorSignalMock}*/ (PatchesStructureOutputs[name])
     }
 
-    static mockLogEnable() {
-        print = true;
+    /**
+    * @param {string} name 
+    * @param {VectorSignalMock} fallback 
+    * @returns {Promise<VectorSignalMock>}
+    */
+    static async getPointOrFallback(name, fallback) {
+        let value;
+        if (!(PatchesStructureOutputs[name] instanceof VectorSignalMock)) value = fallback;
+        else value = PatchesStructureOutputs[name];
+        return /**@type {VectorSignalMock}*/ (value)
+    }
+
+    /**
+    * @param {string} name 
+    * @returns {Promise<Vec2SignalMock>}
+    */
+    static async getPoint2D(name) {
+        if (!(PatchesStructureOutputs[name] instanceof Vec2SignalMock$1)) 
+            throw new TypeError(`Expected Vec2SignalMock`);
+        return /**@type {Vec2SignalMock}*/ (PatchesStructureOutputs[name])
+    }
+
+   /**
+    * @param {string} name 
+    * @param {Vec2SignalMock} fallback 
+    * @returns {Promise<Vec2SignalMock>}
+    */
+    static async getPoint2DOrFallback(name, fallback) {
+        let value;
+        if (!(PatchesStructureOutputs[name] instanceof Vec2SignalMock$1)) value = fallback;
+        else value = PatchesStructureOutputs[name];
+        return /**@type {Vec2SignalMock}*/ (value)
+    }
+
+    /**
+    * @param {string} name 
+    * @returns {Promise<EventSourceMock>}
+    */
+    static async getPulse(name) {
+        if (!(PatchesStructureOutputs[name] instanceof EventSourceMock)) 
+            throw new TypeError(`Expected EventSourceMock`);
+        return /**@type {EventSourceMock}*/ (PatchesStructureOutputs[name])
+    }
+
+   /**
+    * @param {string} name 
+    * @param {EventSourceMock} fallback 
+    * @returns {Promise<EventSourceMock>}
+    */
+    static async getPulseOrFallback(name, fallback) {
+        let value;
+        if (!(PatchesStructureOutputs[name] instanceof EventSourceMock)) value = fallback;    
+        else value = PatchesStructureOutputs[name];
+        return /**@type {EventSourceMock}*/ (value)
+    }
+
+    /**
+    * @param {string} name 
+    * @returns {Promise<ScalarSignalMock>}
+    */
+    static async getScalar(name) {
+        if (!(PatchesStructureOutputs[name] instanceof ScalarSignalMock$1)) 
+            throw new TypeError(`Expected ScalarSiganlMcok`);
+        return /**@type {ScalarSignalMock}*/ (PatchesStructureOutputs[name])
+    }
+    
+    /**
+     * @param {string} name 
+     * @param {ScalarSignalMock | number} fallback 
+     * @returns {Promise<ScalarSignalMock>}
+     */
+    static async getScalarOrFallback(name, fallback) {
+        let value;
+        if (!(PatchesStructureOutputs[name] instanceof ScalarSignalMock$1)) {
+            if (typeof fallback == 'number') value = new ScalarSignalMock$1(fallback);
+            else value = fallback; 
+        }
+        else 
+            value = PatchesStructureOutputs[name];
+        return /**@type {ScalarSignalMock}*/ (value)
+    }
+
+    /**
+    * @param {string} name 
+    * @returns {Promise<StringSignalMock>}
+    */
+    static async getString(name) {
+        if (!(PatchesStructureOutputs[name] instanceof StringSignalMock$1)) 
+            throw new TypeError(`Expected StringSignalMock`);
+        return /**@type {StringSignalMock}*/ (PatchesStructureOutputs[name])
+    }
+    
+    /**
+     * @param {string} name 
+     * @param {StringSignalMock | string} fallback 
+     * @returns {Promise<StringSignalMock>}
+     */
+    static async getStringOrFallback(name, fallback) {
+        let value;
+        if (!(PatchesStructureOutputs[name] instanceof StringSignalMock$1)) {
+            if (typeof fallback == 'string') value = new StringSignalMock$1(fallback);
+            else value = fallback; 
+        }
+        else 
+            value = PatchesStructureOutputs[name];
+        return /**@type {StringSignalMock}*/ (value)
+    }
+
+    /**
+    * @param {string} name 
+    * @returns {Promise<VectorSignalMock>}
+    */
+    static async getVector(name) {
+        if (!(PatchesStructureOutputs[name] instanceof VectorSignalMock)) 
+            throw new TypeError(`Expected VectorSignalMock`);
+        return /**@type {VectorSignalMock}*/ (PatchesStructureOutputs[name])
+    }
+    
+    /**
+     * @param {string} name 
+     * @param {VectorSignalMock} fallback 
+     * @returns {Promise<VectorSignalMock>}
+     */
+    static async getVectorOrFallback(name, fallback) {
+        let value;
+        if (!(PatchesStructureOutputs[name] instanceof VectorSignalMock)) value = fallback;
+        else value = PatchesStructureOutputs[name];
+        return /**@type {VectorSignalMock}*/ (value)
+    }
+
+    /**
+     * @param {Object<string, SignalMock|EventSourceMock>} value 
+     */
+    static mockReset(value = {}) {
+        PatchesStructureOutputs = value;
+    }
+}
+
+class PatchesMock {
+    static get inputs() {
+        return PatchesInputsMock
+    }
+
+    static get outputs() {
+        return PatchesOuputsMock
+    }
+}
+
+class StorageLocationMock {
+    
+    /**
+     * @param {Object<string,Object>} storageLocationData 
+     */
+    constructor(storageLocationData = {}) {
+        /**@type {Object<string,Object>} */
+        this._storageLocationData = storageLocationData;
+    }
+
+    /**
+     * @param {string} key 
+     * @returns {Promise<Object | null>}
+     */
+    async get(key) {
+        return this._storageLocationData[key] ?? null
+    }
+
+    /**
+     * @param {string} key 
+     */
+    async remove(key) {
+        this._storageLocationData[key] = undefined;
+    }
+
+    /**
+     * 
+     * @param {string} key 
+     * @param {Object} value 
+     */
+    async set(key, value) {
+        this._storageLocationData[key] = value;
+    }
+}
+
+let block = new StorageLocationMock();
+let local = new StorageLocationMock();
+
+class PersistenceMock {
+    
+    static get block() {
+        return block
+    }
+
+    static get local() {
+        return local
+    }
+
+    /**
+     * 
+     * @param {*} blockParam 
+     * @param {*} localParam 
+     */
+    static mockReset(blockParam = {}, localParam = {}) {
+        block = new StorageLocationMock(blockParam);
+        local = new StorageLocationMock(localParam);
     }
 }
 
@@ -8593,6 +8576,25 @@ class MultipeerMock {
             this._channels[topic] = new EchoMessageChannelMock(topic);
         }
         return this._channels[topic];
+    }
+}
+
+/**
+ * @exports
+ * @typedef {Object} BlockModulesConfig
+ * @property {{[key: string]: any}} extras
+ * @property {string} multipeerId
+ * @property {StorageLocation} storage
+ */
+
+class BlocksMock {
+    /**
+     * @param {string} blockName 
+     * @param {import("./Scene/SceneObjectBase.mock").SceneObjectBaseMockParams} initialState
+     * @param {BlockModulesConfig | {}} config
+     */
+    static instantiate(blockName, initialState = {name: 'dynamicBlock'}, config = {}) {
+        return SceneMock.create('Block', initialState)
     }
 }
 
@@ -8726,144 +8728,108 @@ class ParticipantsMock {
 
 jest.mock(
 	'Diagnostics',
-	() => {
-		const DiagnosticsMock = jest.requireActual('./Diagnostics.mock.js');
-		return DiagnosticsMock.default;
-	},
+	() => DiagnosticsMock,
 	{ virtual: true },
 );
 
 jest.mock(
 	'CameraInfo',
-	() => {
-		const CameraInfoMock = jest.requireActual('./CameraInfo.mock.js');
-		return CameraInfoMock.default;
-	},
+	() => CameraInfoModuleMock,
 	{ virtual: true },
 );
 
 jest.mock(
 	'Reactive',
-	() => {
-		const ReactiveMock = jest.requireActual('./Reactive/Reactive.mock.js');
-		return ReactiveMock.default;
-	},
+	() => ReactiveMock,
 	{ virtual: true },
 );
 
 jest.mock(
 	'Animation',
-	() => {
-		const AnimationMock = jest.requireActual('./Animation/Animation.mock.js');
-		return AnimationMock.default;
-	},
+	() => AnimationMock,
 	{ virtual: true },
 );
 
 jest.mock(
 	'Time',
-	() => {
-		const TimeMock = jest.requireActual('./Time.mock.js');
-		return TimeMock.default;
-	},
+	() => TimeMock,
 	{ virtual: true },
 );
 
 jest.mock(
 	'Scene',
-	() => {
-		const SceneMock = jest.requireActual('./Scene/SceneModule.mock.js');
-		return SceneMock.default;
-	},
+	() => SceneMock,
 	{ virtual: true },
 );
 
 jest.mock(
 	'Textures',
-	() => {
-		const TexturesMock = jest.requireActual('./Textures/Textures.mock.js');
-		return TexturesMock.default;
-	},
+	() => TexturesMock,
 	{ virtual: true },
 );
 
 jest.mock(
 	'Materials',
-	() => {
-		const MaterialsMock = jest.requireActual('./Materials/Materials.mock.js');
-		return MaterialsMock.default;
-	},
+	() => MaterialsMock,
 	{ virtual: true },
 );
 
 jest.mock(
 	'Patches',
-	() => {
-		const PatchesMock = jest.requireActual('./Patches/Patches.mock.js');
-		return PatchesMock.default;
-	},
+	() => PatchesMock,
 	{ virtual: true },
 );
 
 jest.mock(
 	'Persistence',
-	() => {
-		const PersistenceMock = jest.requireActual('./Persistence/Persistence.mock.js');
-		return PersistenceMock.default;
-	},
+	() => PersistenceMock,
 	{ virtual: true },
 );
 
 jest.mock(
 	'Multipeer',
-	() => {
-		const MultipeerMock = jest.requireActual('./Multipeer.mock.js');
-		return MultipeerMock.default;
-	},
+	() => MultipeerMock,
 	{ virtual: true },
 );
 
 
 jest.mock(
 	'Blocks',
-	() => {
-		const BlocksMock = jest.requireActual('./Blocks.mock.js');
-		return BlocksMock.default;
-	},
+	() => BlocksMock,
 	{ virtual: true },
 );
 
-exports.AnimationMock = AnimationMock;
-exports.BlocksMock = BlocksMock;
-exports.BoolSignalMock = BoolSignalMock;
-exports.BoolSignalSourceMock = BoolSignalSourceMock;
-exports.CameraInfoModuleMock = CameraInfoModuleMock;
-exports.DiagnosticsMock = DiagnosticsMock;
-exports.EventSourceMock = EventSourceMock;
-exports.Mat4Mock = Mat4Mock;
-exports.MaterialBaseMock = MaterialBaseMock;
-exports.MaterialsMock = MaterialsMock;
-exports.MultipeerMock = MultipeerMock;
-exports.ParticipantsMock = ParticipantsMock;
-exports.PatchesInputsMock = PatchesInputsMock;
-exports.PatchesMock = PatchesMock;
-exports.PatchesOuputsMock = PatchesOuputsMock;
-exports.PersistenceMock = PersistenceMock;
-exports.QuaternionSignalMock = QuaternionSignalMock;
-exports.ReactiveMock = ReactiveMock;
-exports.ScalarSignalMock = ScalarSignalMock;
-exports.ScalarSignalSourceMock = ScalarSignalSourceMock;
-exports.SceneMock = SceneMock;
-exports.SceneObjectBaseMock = SceneObjectBaseMock;
-exports.SignalMock = SignalMock;
-exports.StorageLocationMock = StorageLocationMock;
-exports.StringSignalMock = StringSignalMock;
-exports.StringSignalSourceMock = StringSignalSourceMock;
-exports.SubscriptionMock = SubscriptionMock;
-exports.TextureBaseMock = TextureBaseMock;
-exports.TexturesMock = TexturesMock;
-exports.TimeDriverMock = TimeDriverMock;
-exports.TimeMock = TimeMock;
-exports.TransformSignalMock = TransformSignalMock;
-exports.Vec2SignalMock = Vec2SignalMock;
-exports.VectorSignalMock = VectorSignalMock;
+exports.Animation = AnimationMock;
+exports.Blocks = BlocksMock;
+exports.BoolSignal = BoolSignalMock;
+exports.BoolSignalSource = BoolSignalSourceMock;
+exports.CameraInfoModule = CameraInfoModuleMock;
+exports.Diagnostics = DiagnosticsMock;
+exports.EventSource = EventSourceMock;
+exports.Mat4 = Mat4Mock;
+exports.MaterialBase = MaterialBaseMock;
+exports.Materials = MaterialsMock;
+exports.Multipeer = MultipeerMock;
+exports.Participants = ParticipantsMock;
+exports.Patches = PatchesMock;
+exports.PatchesInputs = PatchesInputsMock;
+exports.PatchesOuputs = PatchesOuputsMock;
+exports.Persistence = PersistenceMock;
+exports.QuaternionSignal = QuaternionSignalMock;
+exports.Reactive = ReactiveMock;
+exports.ScalarSignal = ScalarSignalMock;
+exports.ScalarSignalSource = ScalarSignalSourceMock;
+exports.Scene = SceneMock;
+exports.SceneObjectBase = SceneObjectBaseMock;
+exports.Signal = SignalMock;
+exports.StorageLocation = StorageLocationMock;
+exports.StringSignal = StringSignalMock;
+exports.StringSignalSource = StringSignalSourceMock;
+exports.Subscription = SubscriptionMock;
+exports.TextureBase = TextureBaseMock;
+exports.Textures = TexturesMock;
+exports.Time = TimeMock;
+exports.TimeDriver = TimeDriverMock;
+exports.TransformSignal = TransformSignalMock;
+exports.Vec2Signal = Vec2SignalMock;
+exports.VectorSignal = VectorSignalMock;

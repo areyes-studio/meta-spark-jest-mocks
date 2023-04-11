@@ -1,12 +1,12 @@
 {
 	"name": "@areyes-studio/meta-spark-jest-mocks",
 	"description": "Jest mocks for Meta Spark Studio modules",
-	"version": "1.0.0",
+	"version": "1.1.0",
 	"author": {
 		"name": "AREYES.STUDIO"
 	},
 	"main": "./build/main.js",
-	"types": "./types/main.d.ts",
+	"types": "./types/index.d.ts",
 	"type": "module",
 	"license": "MIT",
 	"devDependencies": {
@@ -16,7 +16,8 @@
 		"@types/node": "^14.14.37",
 		"babel-jest": "^29.3.1",
 		"jest": "^29.3.1",
-		"jest-extended": "^3.2.1"
+		"jest-extended": "^3.2.1",
+		"rollup": "^3.20.2"
 	},
 	"scripts": {
 		"test": "jest",
@@ -25,8 +26,7 @@
 	"dependencies": {
 		"@areyes-studio/math-module": "^1.0.0",
 		"@areyes-studio/meta-spark-types": "^158.0.0",
-		"quaternion": "^1.4.0",
-		"rollup": "^3.19.1"
+		"quaternion": "^1.4.0"
 	},
 	"jest": {
 		"testEnvironment": "jest-environment-node",
